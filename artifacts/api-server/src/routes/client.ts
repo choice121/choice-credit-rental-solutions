@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase";
 import { requireAuth, AuthRequest } from "../lib/auth-middleware";
+import { sendEmail, buildPaymentSelectedEmail } from "../lib/email";
 
 const router = Router();
 
@@ -306,11 +307,32 @@ router.post("/me/payment-selection", requireAuth, async (req: AuthRequest, res) 
     applepay: "Apple Pay", googlepay: "Google Pay", venmo: "Venmo",
   };
 
-  await supabase.from("activity_log").insert({
-    type: "payment_selected",
-    description: `Payment method selected: ${methodLabels[method]}`,
-    client_id: req.userId!,
-  });
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", req.userId!)
+    .single();
+
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("amount")
+    .eq("id", invoiceId)
+    .single();
+
+  await Promise.all([
+    supabase.from("activity_log").insert({
+      type: "payment_selected",
+      description: `Payment method selected: ${methodLabels[method]}`,
+      client_id: req.userId!,
+    }),
+    sendEmail(buildPaymentSelectedEmail({
+      clientName: profile?.full_name || "Client",
+      clientEmail: profile?.email || "",
+      method,
+      invoiceId,
+      amount: invoice?.amount,
+    })),
+  ]);
 
   res.status(201).json({
     invoiceId,
