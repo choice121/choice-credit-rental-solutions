@@ -18,12 +18,34 @@ export default function Dashboard() {
   
   const nextStep = plan?.steps.find(s => s.status !== 'completed');
 
+  // Show onboarding card if no active case yet
+  const showOnboarding = !caseLoading && !activeCase;
+
   return (
     <PortalLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-serif font-bold text-foreground">Welcome Back</h1>
         <p className="text-muted-foreground mt-2">Here's the status of your approval journey.</p>
       </div>
+
+      {showOnboarding && (
+        <Card className="mb-8 border-l-4 border-l-primary shadow-sm bg-primary/5">
+          <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-6">
+            <div className="rounded-full bg-primary/10 p-3">
+              <ArrowRight className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground text-lg">Get started with your approval journey</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Your account is set up! Book a free consultation and an advisor will create your personalized plan.
+              </p>
+            </div>
+            <Button asChild className="shrink-0">
+              <Link href="/book">Book Your Free Consultation</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         <Card className="lg:col-span-2 border-l-4 border-l-primary shadow-sm">

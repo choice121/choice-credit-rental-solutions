@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useGetAdminClient, useUpdateAdminClient, useUpdateClientPlan, useReviewDocument, useSendAdminMessage } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, FileText, CheckCircle2, Clock, AlertCircle, Send, User } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { CaseStatus, DocumentReviewStatus, PlanStepStatus } from "@workspace/api-client-react";
@@ -99,8 +100,31 @@ export default function ClientDetail() {
     });
   };
 
-  if (isLoading) return <AdminLayout><div className="p-8 text-center">Loading client data...</div></AdminLayout>;
-  if (!client) return <AdminLayout><div className="p-8 text-center text-destructive">Client not found</div></AdminLayout>;
+  if (isLoading) return (
+    <AdminLayout>
+      <div className="p-6 lg:p-8 space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10 rounded" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+        </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Skeleton className="h-64 rounded-lg" />
+          <Skeleton className="lg:col-span-2 h-64 rounded-lg" />
+        </div>
+      </div>
+    </AdminLayout>
+  );
+  if (!client) return (
+    <AdminLayout>
+      <div className="p-8 text-center">
+        <p className="text-destructive font-medium">Client not found</p>
+        <Link href="/admin/clients" className="text-sm text-muted-foreground hover:underline mt-2 inline-block">← Back to Clients</Link>
+      </div>
+    </AdminLayout>
+  );
 
   return (
     <AdminLayout>

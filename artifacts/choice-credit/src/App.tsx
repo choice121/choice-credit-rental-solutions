@@ -1,37 +1,62 @@
+import { lazy, Suspense } from "react";
 import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
-import NotFound from "@/pages/not-found";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
 
-import Home from "@/pages/public/Home";
-import Services from "@/pages/public/Services";
-import Calculator from "@/pages/public/Calculator";
-import Book from "@/pages/public/Book";
-import Contact from "@/pages/public/Contact";
-import Login from "@/pages/public/Login";
+// Route-level code splitting — each section loads independently
+const Home = lazy(() => import("@/pages/public/Home"));
+const Services = lazy(() => import("@/pages/public/Services"));
+const Calculator = lazy(() => import("@/pages/public/Calculator"));
+const Book = lazy(() => import("@/pages/public/Book"));
+const BookConfirmation = lazy(() => import("@/pages/public/BookConfirmation"));
+const Contact = lazy(() => import("@/pages/public/Contact"));
+const Login = lazy(() => import("@/pages/public/Login"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
-import PortalDashboard from "@/pages/portal/Dashboard";
-import PortalDocuments from "@/pages/portal/Documents";
-import PortalPlan from "@/pages/portal/Plan";
-import PortalMessages from "@/pages/portal/Messages";
-import PortalBilling from "@/pages/portal/Billing";
+const PortalDashboard = lazy(() => import("@/pages/portal/Dashboard"));
+const PortalDocuments = lazy(() => import("@/pages/portal/Documents"));
+const PortalPlan = lazy(() => import("@/pages/portal/Plan"));
+const PortalMessages = lazy(() => import("@/pages/portal/Messages"));
+const PortalBilling = lazy(() => import("@/pages/portal/Billing"));
 
-import AdminDashboard from "@/pages/admin/Dashboard";
-import AdminClients from "@/pages/admin/Clients";
-import AdminClientDetail from "@/pages/admin/ClientDetail";
-import AdminLeads from "@/pages/admin/Leads";
-import AdminMessages from "@/pages/admin/Messages";
-import AdminRevenue from "@/pages/admin/Revenue";
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const AdminClients = lazy(() => import("@/pages/admin/Clients"));
+const AdminClientDetail = lazy(() => import("@/pages/admin/ClientDetail"));
+const AdminLeads = lazy(() => import("@/pages/admin/Leads"));
+const AdminMessages = lazy(() => import("@/pages/admin/Messages"));
+const AdminRevenue = lazy(() => import("@/pages/admin/Revenue"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 30_000 },
+  },
+});
 
-function ProtectedRoute({ component: Component, adminOnly = false }: { component: React.ComponentType, adminOnly?: boolean }) {
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex flex-col gap-4 p-8">
+      <Skeleton className="h-12 w-1/3" />
+      <Skeleton className="h-6 w-1/2" />
+      <Skeleton className="h-64 w-full" />
+    </div>
+  );
+}
+
+function ProtectedRoute({
+  component: Component,
+  adminOnly = false,
+}: {
+  component: React.ComponentType;
+  adminOnly?: boolean;
+}) {
   const { user, isAdmin, loading } = useAuth();
-  
+
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <PageLoader />;
   }
 
   if (!user) {
@@ -51,51 +76,54 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/services" component={Services} />
-      <Route path="/tradeline-calculator" component={Calculator} />
-      <Route path="/book" component={Book} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/login" component={Login} />
+    <Suspense fallback={<PageLoader />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/services" component={Services} />
+        <Route path="/tradeline-calculator" component={Calculator} />
+        <Route path="/book/confirmation" component={BookConfirmation} />
+        <Route path="/book" component={Book} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/login" component={Login} />
 
-      <Route path="/portal">
-        {() => <ProtectedRoute component={PortalDashboard} />}
-      </Route>
-      <Route path="/portal/documents">
-        {() => <ProtectedRoute component={PortalDocuments} />}
-      </Route>
-      <Route path="/portal/plan">
-        {() => <ProtectedRoute component={PortalPlan} />}
-      </Route>
-      <Route path="/portal/messages">
-        {() => <ProtectedRoute component={PortalMessages} />}
-      </Route>
-      <Route path="/portal/billing">
-        {() => <ProtectedRoute component={PortalBilling} />}
-      </Route>
+        <Route path="/portal">
+          {() => <ProtectedRoute component={PortalDashboard} />}
+        </Route>
+        <Route path="/portal/documents">
+          {() => <ProtectedRoute component={PortalDocuments} />}
+        </Route>
+        <Route path="/portal/plan">
+          {() => <ProtectedRoute component={PortalPlan} />}
+        </Route>
+        <Route path="/portal/messages">
+          {() => <ProtectedRoute component={PortalMessages} />}
+        </Route>
+        <Route path="/portal/billing">
+          {() => <ProtectedRoute component={PortalBilling} />}
+        </Route>
 
-      <Route path="/admin">
-        {() => <ProtectedRoute component={AdminDashboard} adminOnly />}
-      </Route>
-      <Route path="/admin/clients">
-        {() => <ProtectedRoute component={AdminClients} adminOnly />}
-      </Route>
-      <Route path="/admin/clients/:id">
-        {() => <ProtectedRoute component={AdminClientDetail} adminOnly />}
-      </Route>
-      <Route path="/admin/leads">
-        {() => <ProtectedRoute component={AdminLeads} adminOnly />}
-      </Route>
-      <Route path="/admin/messages">
-        {() => <ProtectedRoute component={AdminMessages} adminOnly />}
-      </Route>
-      <Route path="/admin/revenue">
-        {() => <ProtectedRoute component={AdminRevenue} adminOnly />}
-      </Route>
+        <Route path="/admin">
+          {() => <ProtectedRoute component={AdminDashboard} adminOnly />}
+        </Route>
+        <Route path="/admin/clients">
+          {() => <ProtectedRoute component={AdminClients} adminOnly />}
+        </Route>
+        <Route path="/admin/clients/:id">
+          {() => <ProtectedRoute component={AdminClientDetail} adminOnly />}
+        </Route>
+        <Route path="/admin/leads">
+          {() => <ProtectedRoute component={AdminLeads} adminOnly />}
+        </Route>
+        <Route path="/admin/messages">
+          {() => <ProtectedRoute component={AdminMessages} adminOnly />}
+        </Route>
+        <Route path="/admin/revenue">
+          {() => <ProtectedRoute component={AdminRevenue} adminOnly />}
+        </Route>
 
-      <Route component={NotFound} />
-    </Switch>
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
@@ -104,10 +132,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
+          <ErrorBoundary>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <Toaster />
+          </ErrorBoundary>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

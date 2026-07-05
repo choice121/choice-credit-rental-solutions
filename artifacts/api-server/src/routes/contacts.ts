@@ -1,38 +1,61 @@
 import { Router } from "express";
+import { z } from "zod";
 import { supabase } from "../lib/supabase";
-import { sendEmail, buildContactEmail } from "../lib/email";
+import { strictLimiter } from "../lib/rate-limiter";
 
 const router = Router();
 
-router.post("/", async (req, res) => {
-  const { fullName, email, phone, message } = req.body;
+const ContactSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().max(20).optional().nullable(),
+  message: z.string().min(10, "Message must be at least 10 characters").max(2000),
+});
 
-  if (!fullName || !email || !message) {
-    res.status(400).json({ error: "Missing required fields" });
-    return;
+router.post("/", strictLimiter, async (req, res) => {
+  try {
+    const parsed = ContactSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.errors[0].message });
+      return;
+    }
+    const { fullName, email, phone, message } = parsed.data;
+
+    const { data, error } = await supabase
+      .from("contacts")
+      .insert({
+        full_name: fullName,
+        email,
+        phone: phone ?? null,
+        message,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Contact insert error:", error);
+      res.status(500).json({ error: "Failed to send message. Please try again." });
+      return;
+    }
+
+    // Side-effect: log activity
+    supabase.from("activity_log").insert({
+      type: "new_contact",
+      description: `Contact form submission from ${fullName}`,
+    }).catch((err) => {
+      console.error("Activity log error:", err);
+    });
+
+    res.status(201).json({
+      id: data.id,
+      fullName: data.full_name,
+      email: data.email,
+      createdAt: data.created_at,
+    });
+  } catch (err) {
+    console.error("Contact route error:", err);
+    res.status(500).json({ error: "An unexpected error occurred. Please try again." });
   }
-
-  const { data, error } = await supabase
-    .from("contacts")
-    .insert({ full_name: fullName, email, phone: phone || null, message })
-    .select()
-    .single();
-
-  if (error) {
-    res.status(500).json({ error: error.message });
-    return;
-  }
-
-  await sendEmail(buildContactEmail({ fullName, email, phone, message }));
-
-  res.status(201).json({
-    id: data.id,
-    fullName: data.full_name,
-    email: data.email,
-    phone: data.phone,
-    message: data.message,
-    createdAt: data.created_at,
-  });
 });
 
 export default router;

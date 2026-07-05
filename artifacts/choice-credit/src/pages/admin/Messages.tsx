@@ -51,9 +51,12 @@ export default function Messages() {
           <div className="divide-y">
             {isLoading ? (
               [1,2,3,4].map(i => (
-                <div key={i} className="p-4 flex items-center gap-4 animate-pulse">
-                  <div className="w-12 h-12 bg-muted rounded-full shrink-0"></div>
-                  <div className="flex-1 space-y-2"><div className="h-4 bg-muted w-1/4 rounded"></div><div className="h-4 bg-muted w-2/3 rounded"></div></div>
+                <div key={i} className="p-4 sm:p-6 flex items-center gap-4">
+                  <Skeleton className="w-12 h-12 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
                 </div>
               ))
             ) : threadList.length === 0 ? (
