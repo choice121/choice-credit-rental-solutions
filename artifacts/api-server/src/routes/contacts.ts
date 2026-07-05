@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase";
+import { sendEmail, buildContactEmail } from "../lib/email";
 
 const router = Router();
 
@@ -21,6 +22,8 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: error.message });
     return;
   }
+
+  await sendEmail(buildContactEmail({ fullName, email, phone, message }));
 
   res.status(201).json({
     id: data.id,

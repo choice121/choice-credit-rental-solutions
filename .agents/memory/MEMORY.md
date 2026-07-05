@@ -1,0 +1,2 @@
+- [Cloudflare Pages pnpm build](cloudflare-pages-pnpm.md) — CF Pages needs PNPM_VERSION env var + PORT must be optional in vite.config.ts for production builds.
+- [Supabase backend pattern](supabase-backend.md) — Backend uses service role client directly (not Drizzle); frontend uses anon key via AuthProvider; JWT validated in auth-middleware with anon key.

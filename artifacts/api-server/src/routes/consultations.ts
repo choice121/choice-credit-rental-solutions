@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase";
-import { requireAdmin, AuthRequest } from "../lib/auth-middleware";
+import { sendEmail, buildLeadEmail } from "../lib/email";
 
 const router = Router();
 
@@ -31,11 +31,13 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  // Log activity
-  await supabase.from("activity_log").insert({
-    type: "new_lead",
-    description: `New consultation request from ${fullName}`,
-  });
+  await Promise.all([
+    supabase.from("activity_log").insert({
+      type: "new_lead",
+      description: `New consultation request from ${fullName}`,
+    }),
+    sendEmail(buildLeadEmail({ fullName, email, phone, situation, preferredTime, packageId })),
+  ]);
 
   res.status(201).json({
     id: data.id,
