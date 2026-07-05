@@ -2,6 +2,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Shield, TrendingUp, Home as HomeIcon, Clock } from "lucide-react";
+import RenterChallenges from "@/components/RenterChallenges";
 
 export default function Home() {
   return (
@@ -84,6 +85,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Renter Challenges */}
+      <RenterChallenges />
 
       {/* Why Choose Us */}
       <section className="py-24 bg-card border-y">

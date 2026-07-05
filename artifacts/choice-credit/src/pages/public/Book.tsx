@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useBookConsultation, useListPackages } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { RENTER_CHALLENGES } from "@/components/RenterChallenges";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
@@ -27,9 +28,10 @@ export default function Book() {
   const { data: packages } = useListPackages();
   const bookConsultation = useBookConsultation();
 
-  // Try to get package ID from URL if they came from services page
   const searchParams = new URLSearchParams(window.location.search);
   const defaultPackageId = searchParams.get("package") || undefined;
+  const challengeSlug = searchParams.get("challenge") || undefined;
+  const matchedChallenge = RENTER_CHALLENGES.find((c) => c.slug === challengeSlug);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,7 +39,7 @@ export default function Book() {
       fullName: "",
       email: "",
       phone: "",
-      situation: "",
+      situation: matchedChallenge ? matchedChallenge.situationPrefill : "",
       preferredTime: "morning",
       packageId: defaultPackageId
     }
@@ -73,6 +75,24 @@ export default function Book() {
             Take the first step toward approval. Tell us about your situation and we'll craft a plan.
           </p>
         </div>
+
+        {matchedChallenge && (
+          <div className="mb-8 rounded-xl border border-border overflow-hidden">
+            <div className={`bg-gradient-to-r ${matchedChallenge.accentColor} px-5 py-3 flex items-center gap-3`}>
+              <div className="text-white">{matchedChallenge.icon}</div>
+              <div>
+                <p className="text-white font-semibold text-sm uppercase tracking-wide">{matchedChallenge.label}</p>
+                <p className="text-white/90 text-xs">{matchedChallenge.headline}</p>
+              </div>
+            </div>
+            <div className="bg-card px-5 py-3 flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                We specialize in this. Your situation description is pre-filled below — edit it to match your details.
+              </p>
+              <span className="text-xs font-medium text-accent ml-4 shrink-0">✓ Matched</span>
+            </div>
+          </div>
+        )}
 
         <Card className="shadow-lg border-t-4 border-t-primary">
           <CardHeader>
@@ -163,7 +183,7 @@ export default function Book() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">I'm not sure yet</SelectItem>
-                          {packages?.map(pkg => (
+                          {Array.isArray(packages) && packages.map(pkg => (
                             <SelectItem key={pkg.id} value={pkg.id}>{pkg.name} - ${pkg.price}</SelectItem>
                           ))}
                         </SelectContent>
