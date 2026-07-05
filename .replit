@@ -53,3 +53,11 @@ externalPort = 80
 [[ports]]
 localPort = 8080
 externalPort = 8080
+
+[userenv]
+
+[userenv.shared]
+BASE_PATH = "/"
+LOG_LEVEL = "info"
+NODE_ENV = "development"
+SUPABASE_URL = "https://fahzqjhwhzdgswtfvjks.supabase.co"
