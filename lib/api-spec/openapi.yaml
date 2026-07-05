@@ -1,0 +1,1077 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Choice Credit and Rental Solutions API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: packages
+    description: Service packages
+  - name: consultations
+    description: Consultation bookings
+  - name: contacts
+    description: Contact form
+  - name: tradeline
+    description: Tradeline calculator
+  - name: client
+    description: Client portal
+  - name: admin
+    description: Admin operations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /packages:
+    get:
+      operationId: listPackages
+      tags: [packages]
+      summary: List all active service packages
+      responses:
+        "200":
+          description: List of packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Package"
+
+  /consultations:
+    post:
+      operationId: bookConsultation
+      tags: [consultations]
+      summary: Book a free consultation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsultationInput"
+      responses:
+        "201":
+          description: Consultation booked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+        "400":
+          description: Validation error
+
+  /contacts:
+    post:
+      operationId: submitContact
+      tags: [contacts]
+      summary: Submit contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Contact submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+
+  /tradeline/estimate:
+    get:
+      operationId: getTradelineEstimate
+      tags: [tradeline]
+      summary: Estimate credit score boost from tradelines
+      parameters:
+        - name: currentScore
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: utilization
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: accountAge
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: numTradelines
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tradeline estimate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradelineEstimate"
+
+  /clients/me:
+    get:
+      operationId: getMyProfile
+      tags: [client]
+      summary: Get current client profile
+      responses:
+        "200":
+          description: Client profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientProfile"
+        "401":
+          description: Unauthorized
+    put:
+      operationId: updateMyProfile
+      tags: [client]
+      summary: Update client profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientProfile"
+
+  /clients/me/case:
+    get:
+      operationId: getMyCase
+      tags: [client]
+      summary: Get client's active case
+      responses:
+        "200":
+          description: Active case
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+        "404":
+          description: No active case
+
+  /clients/me/documents:
+    get:
+      operationId: listMyDocuments
+      tags: [client]
+      summary: List client documents
+      responses:
+        "200":
+          description: Document list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+    post:
+      operationId: uploadDocument
+      tags: [client]
+      summary: Upload a document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentInput"
+      responses:
+        "201":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /clients/me/checklist:
+    get:
+      operationId: getMyChecklist
+      tags: [client]
+      summary: Get document checklist with completion status
+      responses:
+        "200":
+          description: Checklist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Checklist"
+
+  /clients/me/plan:
+    get:
+      operationId: getMyPlan
+      tags: [client]
+      summary: Get personalized approval roadmap
+      responses:
+        "200":
+          description: Approval plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalPlan"
+        "404":
+          description: No plan yet
+
+  /clients/me/messages:
+    get:
+      operationId: listMyMessages
+      tags: [client]
+      summary: Get client messages
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [client]
+      summary: Send a message to advisor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /clients/me/invoices:
+    get:
+      operationId: listMyInvoices
+      tags: [client]
+      summary: Get client invoices
+      responses:
+        "200":
+          description: Invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+
+  /clients/me/payment-selection:
+    post:
+      operationId: selectPaymentMethod
+      tags: [client]
+      summary: Select preferred payment method for invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSelection"
+      responses:
+        "201":
+          description: Payment method selected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSelectionResult"
+
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      summary: Get admin dashboard stats
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /admin/clients:
+    get:
+      operationId: listAdminClients
+      tags: [admin]
+      summary: List all clients
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Client list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminClient"
+
+  /admin/clients/{id}:
+    get:
+      operationId: getAdminClient
+      tags: [admin]
+      summary: Get client detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Client detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminClientDetail"
+    put:
+      operationId: updateAdminClient
+      tags: [admin]
+      summary: Update client info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminClientUpdate"
+      responses:
+        "200":
+          description: Updated client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminClient"
+
+  /admin/clients/{id}/plan:
+    put:
+      operationId: updateClientPlan
+      tags: [admin]
+      summary: Update client approval plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlanUpdate"
+      responses:
+        "200":
+          description: Updated plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalPlan"
+
+  /admin/leads:
+    get:
+      operationId: listLeads
+      tags: [admin]
+      summary: List consultation requests (leads)
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Leads list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Consultation"
+
+  /admin/leads/{id}:
+    put:
+      operationId: updateLead
+      tags: [admin]
+      summary: Update lead status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadUpdate"
+      responses:
+        "200":
+          description: Updated lead
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consultation"
+
+  /admin/messages:
+    get:
+      operationId: listAdminMessages
+      tags: [admin]
+      summary: List all messages across clients
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendAdminMessage
+      tags: [admin]
+      summary: Send message to a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminMessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /admin/documents/{id}:
+    put:
+      operationId: reviewDocument
+      tags: [admin]
+      summary: Review and update document status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentReview"
+      responses:
+        "200":
+          description: Updated document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /admin/invoices/{id}/status:
+    put:
+      operationId: updateInvoiceStatus
+      tags: [admin]
+      summary: Mark invoice as paid or unpaid
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceStatusUpdate"
+      responses:
+        "200":
+          description: Updated invoice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+
+  /admin/revenue:
+    get:
+      operationId: getRevenueOverview
+      tags: [admin]
+      summary: Get revenue overview
+      responses:
+        "200":
+          description: Revenue stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueOverview"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    Package:
+      type: object
+      required: [id, name, price, description, features, tier]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        tier:
+          type: string
+          enum: [starter, standard, premium]
+        price:
+          type: number
+        description:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+
+    ConsultationInput:
+      type: object
+      required: [fullName, email, phone, situation]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        situation:
+          type: string
+        preferredTime:
+          type: ["string", "null"]
+        packageId:
+          type: ["string", "null"]
+
+    Consultation:
+      type: object
+      required: [id, fullName, email, phone, situation, status, createdAt]
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        situation:
+          type: string
+        preferredTime:
+          type: ["string", "null"]
+        packageId:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [new, contacted, converted, closed]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    LeadUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, contacted, converted, closed]
+        notes:
+          type: ["string", "null"]
+
+    ContactInput:
+      type: object
+      required: [fullName, email, message]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        message:
+          type: string
+
+    Contact:
+      type: object
+      required: [id, fullName, email, message, createdAt]
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        message:
+          type: string
+        createdAt:
+          type: string
+
+    TradelineEstimate:
+      type: object
+      required: [currentScore, estimatedBoost, estimatedNewScore, recommendation]
+      properties:
+        currentScore:
+          type: integer
+        estimatedBoost:
+          type: integer
+        estimatedNewScore:
+          type: integer
+        recommendation:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+    ClientProfile:
+      type: object
+      required: [id, email, fullName, role, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [client, admin]
+        avatarUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+        phone:
+          type: ["string", "null"]
+
+    Case:
+      type: object
+      required: [id, clientId, status, packageName, createdAt]
+      properties:
+        id:
+          type: string
+        clientId:
+          type: string
+        packageName:
+          type: string
+        status:
+          type: string
+          enum: [intake, in_progress, review, approved, completed]
+        advisorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    Document:
+      type: object
+      required: [id, clientId, name, fileUrl, fileType, status, uploadedAt]
+      properties:
+        id:
+          type: string
+        clientId:
+          type: string
+        caseId:
+          type: ["string", "null"]
+        name:
+          type: string
+        fileUrl:
+          type: string
+        fileType:
+          type: string
+        status:
+          type: string
+          enum: [pending, reviewing, approved, rejected]
+        advisorNotes:
+          type: ["string", "null"]
+        uploadedAt:
+          type: string
+
+    DocumentInput:
+      type: object
+      required: [name, fileUrl, fileType]
+      properties:
+        name:
+          type: string
+        fileUrl:
+          type: string
+        fileType:
+          type: string
+        caseId:
+          type: ["string", "null"]
+
+    DocumentReview:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, reviewing, approved, rejected]
+        advisorNotes:
+          type: ["string", "null"]
+
+    Checklist:
+      type: object
+      required: [items, completedCount, totalCount]
+      properties:
+        completedCount:
+          type: integer
+        totalCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChecklistItem"
+
+    ChecklistItem:
+      type: object
+      required: [id, label, required, completed]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: ["string", "null"]
+        required:
+          type: boolean
+        completed:
+          type: boolean
+        documentId:
+          type: ["string", "null"]
+
+    ApprovalPlan:
+      type: object
+      required: [id, caseId, title, steps, createdAt]
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        title:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanStep"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    PlanStep:
+      type: object
+      required: [id, order, title, status]
+      properties:
+        id:
+          type: string
+        order:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
+        dueDate:
+          type: ["string", "null"]
+
+    PlanUpdate:
+      type: object
+      required: [title, steps]
+      properties:
+        title:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanStep"
+
+    Message:
+      type: object
+      required: [id, senderId, senderName, content, createdAt]
+      properties:
+        id:
+          type: string
+        caseId:
+          type: ["string", "null"]
+        clientId:
+          type: ["string", "null"]
+        senderId:
+          type: string
+        senderName:
+          type: string
+        senderRole:
+          type: string
+          enum: [client, admin]
+        content:
+          type: string
+        createdAt:
+          type: string
+        readAt:
+          type: ["string", "null"]
+
+    MessageInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+        caseId:
+          type: ["string", "null"]
+
+    AdminMessageInput:
+      type: object
+      required: [clientId, content]
+      properties:
+        clientId:
+          type: string
+        content:
+          type: string
+        caseId:
+          type: ["string", "null"]
+
+    Invoice:
+      type: object
+      required: [id, clientId, amount, status, createdAt]
+      properties:
+        id:
+          type: string
+        clientId:
+          type: string
+        caseId:
+          type: ["string", "null"]
+        packageName:
+          type: string
+        amount:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, cancelled]
+        paymentMethod:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        paidAt:
+          type: ["string", "null"]
+
+    PaymentSelection:
+      type: object
+      required: [invoiceId, method]
+      properties:
+        invoiceId:
+          type: string
+        method:
+          type: string
+          enum: [cashapp, paypal, zelle, applepay, googlepay, venmo]
+
+    PaymentSelectionResult:
+      type: object
+      required: [invoiceId, method, message]
+      properties:
+        invoiceId:
+          type: string
+        method:
+          type: string
+        message:
+          type: string
+
+    InvoiceStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [pending, paid, cancelled]
+
+    AdminClient:
+      type: object
+      required: [id, email, fullName, role, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+        caseStatus:
+          type: ["string", "null"]
+        packageName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    AdminClientDetail:
+      type: object
+      required: [id, email, fullName, role, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+        case:
+          $ref: "#/components/schemas/Case"
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
+        plan:
+          $ref: "#/components/schemas/ApprovalPlan"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+        invoices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"
+        createdAt:
+          type: string
+
+    AdminClientUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+        phone:
+          type: ["string", "null"]
+        caseStatus:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+
+    DashboardStats:
+      type: object
+      required: [totalClients, activeClients, newLeads, pendingDocuments, totalRevenue, paidRevenue, recentActivity]
+      properties:
+        totalClients:
+          type: integer
+        activeClients:
+          type: integer
+        newLeads:
+          type: integer
+        pendingDocuments:
+          type: integer
+        totalRevenue:
+          type: number
+        paidRevenue:
+          type: number
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+
+    RevenueOverview:
+      type: object
+      required: [totalRevenue, paidRevenue, pendingRevenue, invoiceCount]
+      properties:
+        totalRevenue:
+          type: number
+        paidRevenue:
+          type: number
+        pendingRevenue:
+          type: number
+        invoiceCount:
+          type: integer
+        byPackage:
+          type: array
+          items:
+            $ref: "#/components/schemas/RevenueByPackage"
+
+    RevenueByPackage:
+      type: object
+      required: [packageName, total, count]
+      properties:
+        packageName:
+          type: string
+        total:
+          type: number
+        count:
+          type: integer
