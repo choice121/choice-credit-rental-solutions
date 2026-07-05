@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingDown, FileWarning, Home, Briefcase } from "lucide-react";
+import { ArrowRight, TrendingDown, FileWarning, Home, Briefcase, FileMinus } from "lucide-react";
 
 export interface RenterChallenge {
   slug: string;
@@ -77,6 +77,21 @@ export const RENTER_CHALLENGES: RenterChallenge[] = [
     accentColor: "from-blue-600 to-indigo-500",
     iconBg: "bg-blue-100 text-blue-600",
   },
+  {
+    slug: "broken-lease",
+    icon: <FileMinus className="w-7 h-7" />,
+    label: "Broken Lease",
+    headline: "Left a lease early?",
+    stat: "$0",
+    statLabel: "debt shouldn't block your next home",
+    description:
+      "A broken lease — whether from job loss, domestic issues, or a landlord dispute — shows up on your rental history and credit report. We help you resolve outstanding balances, dispute inaccurate records, and rebuild your rental profile.",
+    what: "Balance negotiation · Rental history disputes · Landlord reference strategy",
+    situationPrefill:
+      "I broke a lease at [approximate date / city] due to [job loss / relocation / landlord dispute / other reason]. There is [an outstanding balance of $X / a collections account / a negative rental history entry] that has been causing denials.",
+    accentColor: "from-purple-600 to-violet-500",
+    iconBg: "bg-purple-100 text-purple-600",
+  },
 ];
 
 export default function RenterChallenges() {
@@ -95,7 +110,7 @@ export default function RenterChallenges() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {RENTER_CHALLENGES.map((challenge) => (
             <div
               key={challenge.slug}
