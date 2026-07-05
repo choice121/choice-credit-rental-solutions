@@ -3,7 +3,7 @@ import PortalLayout from "@/components/layout/PortalLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useListMyMessages, useSendMessage, useGetMyProfile } from "@workspace/api-client-react";
+import { useListMyMessages, useSendMessage, useGetMyProfile, getListMyMessagesQueryKey } from "@workspace/api-client-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Send, MessageSquare } from "lucide-react";
@@ -33,8 +33,8 @@ export default function Messages() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages" },
         () => {
-          // Invalidate and refetch the messages query on new message
-          queryClient.invalidateQueries({ queryKey: ["listMyMessages"] });
+          // Invalidate the correct generated query key so TanStack Query refetches
+          queryClient.invalidateQueries({ queryKey: getListMyMessagesQueryKey() });
         },
       )
       .subscribe();

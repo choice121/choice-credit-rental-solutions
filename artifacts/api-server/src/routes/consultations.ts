@@ -44,14 +44,21 @@ router.post("/", strictLimiter, async (req, res) => {
       return;
     }
 
-    // Fire-and-forget side effects — don't let them block or crash the response
+    // Fire-and-forget side effects — failures are logged but don't crash the response
     Promise.all([
       supabase.from("activity_log").insert({
         type: "new_lead",
         description: `New consultation request from ${fullName}`,
       }),
-      sendEmail(buildLeadEmail({ fullName, email, phone, situation, preferredTime, packageId })),
-    ]).catch((err) => {
+      sendEmail(buildLeadEmail({
+        fullName,
+        email,
+        phone,
+        situation,
+        preferredTime: preferredTime ?? undefined,
+        packageId: packageId ?? undefined,
+      })),
+    ]).catch((err: unknown) => {
       console.error("Side-effect error after consultation insert:", err);
     });
 
@@ -67,7 +74,7 @@ router.post("/", strictLimiter, async (req, res) => {
       notes: data.notes,
       createdAt: data.created_at,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Consultation route error:", err);
     res.status(500).json({ error: "An unexpected error occurred. Please try again." });
   }

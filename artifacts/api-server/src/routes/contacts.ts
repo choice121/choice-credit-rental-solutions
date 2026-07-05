@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { supabase } from "../lib/supabase";
+import { sendEmail, buildContactEmail } from "../lib/email";
 import { strictLimiter } from "../lib/rate-limiter";
 
 const router = Router();
@@ -38,12 +39,20 @@ router.post("/", strictLimiter, async (req, res) => {
       return;
     }
 
-    // Side-effect: log activity
-    supabase.from("activity_log").insert({
-      type: "new_contact",
-      description: `Contact form submission from ${fullName}`,
-    }).catch((err) => {
-      console.error("Activity log error:", err);
+    // Fire-and-forget side effects
+    Promise.all([
+      supabase.from("activity_log").insert({
+        type: "new_contact",
+        description: `Contact form submission from ${fullName}`,
+      }),
+      sendEmail(buildContactEmail({
+        fullName,
+        email,
+        phone: phone ?? undefined,
+        message,
+      })),
+    ]).catch((err: unknown) => {
+      console.error("Side-effect error after contact insert:", err);
     });
 
     res.status(201).json({
@@ -52,7 +61,7 @@ router.post("/", strictLimiter, async (req, res) => {
       email: data.email,
       createdAt: data.created_at,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Contact route error:", err);
     res.status(500).json({ error: "An unexpected error occurred. Please try again." });
   }
