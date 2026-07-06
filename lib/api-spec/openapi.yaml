@@ -41,6 +41,12 @@ paths:
       operationId: listPackages
       tags: [packages]
       summary: List all active service packages
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: "Filter by category (consulting | profile_building | done_for_you | addon)"
       responses:
         "200":
           description: List of packages
@@ -50,6 +56,63 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Package"
+
+  /add-ons:
+    get:
+      operationId: listAddOnPackages
+      tags: [packages]
+      summary: List all active add-on packages (public)
+      responses:
+        "200":
+          description: List of add-on packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Package"
+
+  /add-ons/me:
+    get:
+      operationId: listMyAddOns
+      tags: [client]
+      summary: List add-ons on the current client's active case
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Add-ons on the client's case
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AddOn"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: addMyAddOn
+      tags: [client]
+      summary: Attach an add-on to the current client's active case
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddOnInput"
+      responses:
+        "201":
+          description: Add-on created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddOn"
+        "401":
+          description: Unauthorized
+        "404":
+          description: No active case found
 
   /consultations:
     post:
@@ -556,17 +619,25 @@ components:
 
     Package:
       type: object
-      required: [id, name, price, description, features, tier]
+      required: [id, name, description, features, tier]
       properties:
         id:
           type: string
         name:
           type: string
+        slug:
+          type: ["string", "null"]
         tier:
           type: string
-          enum: [starter, standard, premium]
+          description: "Tier identifier: starter | standard | premium | profile_standard | profile_expedited | done_for_you | addon"
+        category:
+          type: ["string", "null"]
+          description: "consulting | profile_building | done_for_you | addon"
         price:
-          type: number
+          type: ["number", "null"]
+        priceLabel:
+          type: ["string", "null"]
+          description: "Display label for variable pricing, e.g. 'Varies' or '$2,500–$2,800'"
         description:
           type: string
         features:
@@ -577,6 +648,43 @@ components:
           type: boolean
         createdAt:
           type: string
+
+    AddOn:
+      type: object
+      required: [id, caseId, name, status, addedAt]
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        packageId:
+          type: ["string", "null"]
+        name:
+          type: string
+        price:
+          type: ["number", "null"]
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+        notes:
+          type: ["string", "null"]
+        addedAt:
+          type: string
+        updatedAt:
+          type: string
+
+    AddOnInput:
+      type: object
+      required: [name]
+      properties:
+        packageId:
+          type: ["string", "null"]
+        name:
+          type: string
+        price:
+          type: ["number", "null"]
+        notes:
+          type: ["string", "null"]
 
     ConsultationInput:
       type: object

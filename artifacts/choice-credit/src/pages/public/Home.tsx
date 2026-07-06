@@ -279,8 +279,11 @@ export default function Home() {
           <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-primary-foreground mb-6 leading-[1.05]">
             From Denied<br className="hidden sm:block" /> to Approved.
           </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/75 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Professional credit and rental approval consulting. We help you overcome credit issues, past rental history, and income verification challenges to secure the home you deserve.
+          <p className="text-lg md:text-xl text-primary-foreground/75 mb-4 max-w-2xl mx-auto leading-relaxed">
+            Evictions, bad credit, criminal history, or income gaps — none of these disqualify you. We specialize in getting people approved when every other door has closed.
+          </p>
+          <p className="text-base text-primary-foreground/55 mb-10 max-w-xl mx-auto">
+            Professional credit and rental approval consulting, serving all 50 states.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -329,7 +332,7 @@ export default function Home() {
               Stop letting a number define your living situation.
             </h2>
             <p className="text-xl text-primary-foreground/75 mb-10">
-              Take the first step toward your new home today with a free, no-obligation consultation.
+              Evictions, criminal history, low credit — we've seen it all and helped clients through it all. Your next chapter starts with one conversation.
             </p>
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg h-14 px-10 shadow-lg" asChild>
               <Link href="/book">Schedule Your Free Consultation</Link>

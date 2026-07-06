@@ -5,17 +5,19 @@
  * Choice Credit and Rental Solutions API
  * OpenAPI spec version: 0.1.0
  */
-import type { CaseStatus } from './caseStatus';
+import type { AddOnStatus } from './addOnStatus';
 
-export interface Case {
+export interface AddOn {
   id: string;
-  clientId: string;
-  packageName: string;
-  status: CaseStatus;
+  caseId: string;
   /** @nullable */
-  advisorName?: string | null;
+  packageId?: string | null;
+  name: string;
+  /** @nullable */
+  price?: number | null;
+  status: AddOnStatus;
   /** @nullable */
   notes?: string | null;
-  createdAt: string;
+  addedAt: string;
   updatedAt?: string;
 }

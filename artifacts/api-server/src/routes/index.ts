@@ -6,6 +6,7 @@ import contactsRouter from "./contacts";
 import tradelineRouter from "./tradeline";
 import clientRouter from "./client";
 import adminRouter from "./admin";
+import addOnsRouter from "./add-ons";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use("/contacts", contactsRouter);
 router.use("/tradeline", tradelineRouter);
 router.use("/clients", clientRouter);
 router.use("/admin", adminRouter);
+router.use("/add-ons", addOnsRouter);
 
 export default router;

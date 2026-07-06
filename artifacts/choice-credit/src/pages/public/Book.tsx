@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useBookConsultation, useListPackages } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { RENTER_CHALLENGES } from "@/components/RenterChallenges";
 import Testimonials from "@/components/Testimonials";
 import { CheckCircle2, Clock, Phone, Mail, Lock, Star } from "lucide-react";
@@ -147,9 +147,21 @@ export default function Book() {
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-primary-foreground mb-3">
             Request a Free Consultation
           </h1>
-          <p className="text-primary-foreground/70">
-            Tell us about your situation and we'll craft a plan to get you approved.
+          <p className="text-primary-foreground/70 max-w-xl mx-auto">
+            Evictions, bad credit, criminal history, income gaps — we specialize in exactly these situations. Tell us where you are and we'll map out how to get you approved.
           </p>
+        </div>
+      </div>
+
+      {/* Serious clients notice */}
+      <div className="bg-foreground text-background py-4 border-b border-background/10">
+        <div className="container max-w-3xl flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+          <div className="flex items-center gap-2 text-sm font-semibold text-background">
+            <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+            We only work with clients who are ready to take action now.
+          </div>
+          <span className="hidden sm:block text-background/30">·</span>
+          <span className="text-xs text-background/60">If you're still researching, review our <Link href="/services" className="underline underline-offset-2 hover:text-background transition-colors">services page</Link> first.</span>
         </div>
       </div>
 

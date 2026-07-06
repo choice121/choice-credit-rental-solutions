@@ -6,10 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface ContactInput {
-  fullName: string;
-  email: string;
-  /** @nullable */
-  phone?: string | null;
-  message: string;
-}
+export type ListPackagesParams = {
+/**
+ * Filter by category (consulting | profile_building | done_for_you | addon)
+ */
+category?: string;
+};

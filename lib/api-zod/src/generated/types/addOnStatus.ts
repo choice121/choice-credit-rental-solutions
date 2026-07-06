@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type PlanStepStatus = typeof PlanStepStatus[keyof typeof PlanStepStatus];
+export type AddOnStatus = typeof AddOnStatus[keyof typeof AddOnStatus];
 
 
-export const PlanStepStatus = {
-  pending: 'pending',
-  in_progress: 'in_progress',
+export const AddOnStatus = {
+  active: 'active',
   completed: 'completed',
+  cancelled: 'cancelled',
 } as const;

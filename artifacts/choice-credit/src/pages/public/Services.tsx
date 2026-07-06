@@ -2,8 +2,12 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home, ArrowRight, Star } from "lucide-react";
+import {
+  Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home,
+  ArrowRight, Star, FileSearch, AlertCircle, CheckCircle2
+} from "lucide-react";
 import { Link } from "wouter";
+import Testimonials from "@/components/Testimonials";
 
 const STATIC_PACKAGES = [
   {
@@ -152,6 +156,13 @@ const ADDONS = [
     href: "/book?service=assessment",
   },
   {
+    name: "Rental History Verification",
+    price: "$199",
+    description: "We document, verify, and present your rental history in the format landlords trust — even if it's limited, disputed, or incomplete.",
+    badge: "New",
+    href: "/book?service=rental-history",
+  },
+  {
     name: "Car Approval Package",
     price: "$1,600",
     description: "Three seasoned tradelines designed to improve your financing readiness for vehicle purchases. Profile builds in 30 days.",
@@ -181,6 +192,159 @@ const MINI_TESTIMONIALS = [
   { initials: "JK", bg: "bg-emerald-600", quote: "Freelancers with no pay stubs — townhome approved!", challenge: "Income" },
 ];
 
+// Who we work with section
+function SeriousClientsOnly() {
+  const weHelp = [
+    "You have an eviction — recent or old",
+    "You have bad credit or no credit history",
+    "You have a criminal record",
+    "You're self-employed or have non-traditional income",
+    "You've been denied 2+ times already",
+    "You have a broken lease or collections balance",
+    "You're a first-time renter with no rental history",
+  ];
+
+  const notAFit = [
+    "You want to wait and \"see what happens\"",
+    "You're not ready to take action within the next 30 days",
+    "You're looking for a free workaround with no investment",
+  ];
+
+  return (
+    <section className="py-20 bg-foreground text-background">
+      <div className="container max-w-5xl">
+        <div className="text-center mb-12">
+          <span className="inline-block bg-accent/20 text-accent font-semibold text-sm uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+            Who We Work With
+          </span>
+          <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
+            We only work with clients who are ready to move forward.
+          </h2>
+          <p className="text-background/70 text-lg max-w-2xl mx-auto">
+            Past challenges do not disqualify you — lack of commitment does. If you're serious about getting housed, we're serious about getting you there.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* We help */}
+          <div className="bg-background/5 border border-background/10 rounded-2xl p-7">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              </div>
+              <h3 className="font-bold text-lg text-background">We've helped clients with:</h3>
+            </div>
+            <ul className="space-y-3">
+              {weHelp.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <Check className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                  <span className="text-background/80 text-sm">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Not a fit */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-background/5 border border-background/10 rounded-2xl p-7">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-rose-400" />
+                </div>
+                <h3 className="font-bold text-lg text-background">Not the right fit if:</h3>
+              </div>
+              <ul className="space-y-3">
+                {notAFit.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-rose-400 shrink-0 mt-0.5 font-bold text-sm">✕</span>
+                    <span className="text-background/80 text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-accent/10 border border-accent/20 rounded-2xl p-6 text-center">
+              <p className="font-serif text-xl font-bold text-background mb-2">
+                Positive results — guaranteed focus.
+              </p>
+              <p className="text-background/65 text-sm mb-5">
+                We stay focused on clients who want real results, not just reassurance. If that's you, let's get to work.
+              </p>
+              <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90 w-full h-11">
+                <Link href="/book">I'm Ready — Book Free Consultation</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Rental History Verification section
+function RentalHistoryVerification() {
+  const features = [
+    "Rental history audit — we review every past tenancy on record",
+    "Verification letter drafting for landlords and property managers",
+    "Prior landlord outreach and reference coordination",
+    "Positive history presentation package (formatted, professional)",
+    "Custom narrative creation for limited or incomplete histories",
+    "Dispute support for inaccurate or unfair rental history entries",
+  ];
+
+  return (
+    <section className="py-20 bg-background" id="rental-history-verification">
+      <div className="container max-w-6xl">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-600 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+              <FileSearch className="w-4 h-4" />
+              Rental History Verification
+            </div>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-5 leading-tight">
+              Your rental past doesn't<br className="hidden sm:block" /> have to define your future.
+            </h2>
+            <p className="text-muted-foreground text-lg mb-5 leading-relaxed">
+              Landlords treat rental history as a mirror of your reliability. But what if your history is incomplete, disputed, or simply not told in the right way? We fix that.
+            </p>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              Whether you have gaps, an old eviction, no rental history at all, or references you can't track down — we document, verify, and present your story in a format that builds trust with landlords instead of raising red flags.
+            </p>
+            <Button asChild className="h-12 px-6">
+              <Link href="/book?service=rental-history">
+                Get Rental History Help <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+            <p className="text-xs text-muted-foreground mt-3">Standalone service · $199 · No package required</p>
+          </div>
+
+          <div className="bg-card border rounded-2xl p-8 shadow-sm">
+            <h3 className="font-semibold text-foreground mb-6 text-sm uppercase tracking-wider">What's included</h3>
+            <ul className="space-y-4">
+              {features.map((f, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-3.5 h-3.5 text-blue-600" />
+                  </div>
+                  <span className="text-sm text-foreground/80 leading-relaxed">{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-7 pt-6 border-t flex items-center justify-between">
+              <div>
+                <span className="text-3xl font-bold text-foreground">$199</span>
+                <span className="text-muted-foreground text-sm ml-2">one-time</span>
+              </div>
+              <Badge variant="secondary" className="text-xs font-semibold">Standalone Add-on</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Services() {
   return (
     <PublicLayout>
@@ -203,9 +367,10 @@ export default function Services() {
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight">
             Every Path to Approval,<br className="hidden sm:block" /> Covered.
           </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/75 max-w-2xl mx-auto mb-8">
-            From credit consulting to full done-for-you approvals — transparent pricing, real results.
+          <p className="text-lg md:text-xl text-primary-foreground/75 max-w-2xl mx-auto mb-4">
+            Evictions, criminal records, bad credit, no credit, income gaps — past challenges don't disqualify you. We have a service for every situation.
           </p>
+          <p className="text-primary-foreground/55 text-sm mb-8">Transparent pricing. Real results. All 50 states.</p>
           <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 h-13 px-8" asChild>
             <Link href="/book">Get a Free Consultation</Link>
           </Button>
@@ -292,6 +457,9 @@ export default function Services() {
         </div>
       </section>
 
+      {/* Full Testimonials carousel after consulting packages */}
+      <Testimonials />
+
       {/* Profile Building Packages */}
       <section className="py-20 bg-muted/50 border-y">
         <div className="container max-w-6xl">
@@ -352,8 +520,11 @@ export default function Services() {
         </div>
       </section>
 
+      {/* Rental History Verification */}
+      <RentalHistoryVerification />
+
       {/* Done-For-You Services */}
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-muted/30 border-y">
         <div className="container max-w-6xl">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
@@ -414,7 +585,7 @@ export default function Services() {
       </section>
 
       {/* Additional Services & Add-ons */}
-      <section className="py-20 bg-muted/50 border-t">
+      <section className="py-20 bg-background border-t">
         <div className="container max-w-5xl">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
@@ -425,11 +596,11 @@ export default function Services() {
               Standalone services & upgrades
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Entry-point diagnostics, auto financing prep, and add-ons to supercharge any package.
+              Entry-point diagnostics, rental history support, auto financing prep, and add-ons to supercharge any package.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {ADDONS.map((addon) => (
               <Card key={addon.name} className="flex flex-col hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
@@ -451,6 +622,9 @@ export default function Services() {
         </div>
       </section>
 
+      {/* Serious Clients Only */}
+      <SeriousClientsOnly />
+
       {/* CTA */}
       <section className="py-20 bg-primary text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1560518846-cebc533b6271?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
@@ -459,7 +633,7 @@ export default function Services() {
             Not sure which service fits your situation?
           </h2>
           <p className="text-lg text-primary-foreground/75 mb-8">
-            Book a free 15-minute consultation. We'll review your situation and tell you exactly what you need.
+            Book a free consultation. We'll review your situation and tell you exactly what you need — no upselling, no pressure.
           </p>
           <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-10 text-base shadow-lg" asChild>
             <Link href="/book">Book Free Consultation</Link>

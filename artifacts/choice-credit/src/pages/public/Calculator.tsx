@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useGetTradelineEstimate } from "@workspace/api-client-react";
-import { TrendingUp, ArrowRight, Star, Lock } from "lucide-react";
+import { TrendingUp, ArrowRight, Star, Lock, Share2, Check } from "lucide-react";
 
 function getScoreColor(score: number) {
   if (score < 580) return "text-rose-500";
@@ -30,11 +30,73 @@ function getProofClient(score: number): { initials: string; bg: string; name: st
   return { initials: "AM", bg: "bg-pink-600", name: "Aaliyah M.", from: 591, to: 720, days: 19 };
 }
 
+// Read initial values from URL search params (for shareable links)
+function getInitialParams(): { score: number; utilization: number; age: number } {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    score: Math.min(850, Math.max(300, Number(params.get("score")) || 580)),
+    utilization: Math.min(100, Math.max(0, Number(params.get("util")) || 80)),
+    age: Math.min(20, Math.max(0, Number(params.get("age")) || 2)),
+  };
+}
+
+// Share button with copy-to-clipboard
+function ShareButton({ score, utilization, age }: { score: number; utilization: number; age: number }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(() => {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("score", String(score));
+    url.searchParams.set("util", String(utilization));
+    url.searchParams.set("age", String(age));
+
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }).catch(() => {
+      // Fallback for browsers without clipboard API
+      prompt("Copy this link to share your estimate:", url.toString());
+    });
+  }, [score, utilization, age]);
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleShare}
+      className="gap-2 text-xs h-8"
+    >
+      {copied ? (
+        <>
+          <Check className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="text-emerald-600">Copied!</span>
+        </>
+      ) : (
+        <>
+          <Share2 className="w-3.5 h-3.5" />
+          Share this estimate
+        </>
+      )}
+    </Button>
+  );
+}
+
 export default function Calculator() {
-  const [score, setScore] = useState(580);
-  const [utilization, setUtilization] = useState(80);
-  const [age, setAge] = useState(2);
+  const initial = getInitialParams();
+  const [score, setScore] = useState(initial.score);
+  const [utilization, setUtilization] = useState(initial.utilization);
+  const [age, setAge] = useState(initial.age);
   const [debouncedParams, setDebouncedParams] = useState({ score, utilization, age });
+
+  // Sync state changes to URL (so the page is shareable / bookmarkable)
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("score", String(score));
+    url.searchParams.set("util", String(utilization));
+    url.searchParams.set("age", String(age));
+    window.history.replaceState({}, "", url.toString());
+  }, [score, utilization, age]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,6 +127,9 @@ export default function Calculator() {
           <p className="text-lg md:text-xl text-primary-foreground/75 max-w-2xl mx-auto">
             Dial in your current profile and see the potential impact of strategic tradeline placement on your credit score and rental approval odds.
           </p>
+          <p className="text-sm text-primary-foreground/50 mt-3">
+            Share your results with the link — adjust the sliders and copy the URL.
+          </p>
         </div>
       </div>
 
@@ -73,11 +138,14 @@ export default function Calculator() {
 
           {/* Input card */}
           <Card className="shadow-lg border-t-4 border-t-accent">
-            <CardHeader>
-              <CardTitle className="font-serif text-2xl">Your Current Profile</CardTitle>
-              <CardDescription>Adjust the sliders to match your situation</CardDescription>
+            <CardHeader className="flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="font-serif text-2xl">Your Current Profile</CardTitle>
+                <CardDescription>Adjust the sliders to match your situation</CardDescription>
+              </div>
+              <ShareButton score={score} utilization={utilization} age={age} />
             </CardHeader>
-            <CardContent className="space-y-8">
+            <CardContent className="space-y-8 pt-4">
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <Label className="text-base font-semibold">Current Credit Score</Label>
@@ -129,6 +197,14 @@ export default function Calculator() {
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>0</span><span>20+</span>
                 </div>
+              </div>
+
+              {/* Share nudge */}
+              <div className="bg-muted/50 rounded-xl p-4 flex items-center gap-3">
+                <Share2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Your estimate is saved in the URL — copy and share it with anyone, or save it for later. The sliders will load exactly as you left them.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -206,6 +282,11 @@ export default function Calculator() {
                     Get My Free Analysis <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Link>
                 </Button>
+
+                {/* Share from results too */}
+                <div className="mt-3 flex justify-center">
+                  <ShareButton score={score} utilization={utilization} age={age} />
+                </div>
               </div>
             )}
 

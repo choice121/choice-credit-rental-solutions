@@ -6,10 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface DocumentInput {
-  name: string;
-  fileUrl: string;
-  fileType: string;
+export interface AddOnInput {
   /** @nullable */
-  caseId?: string | null;
+  packageId?: string | null;
+  name: string;
+  /** @nullable */
+  price?: number | null;
+  /** @nullable */
+  notes?: string | null;
 }
