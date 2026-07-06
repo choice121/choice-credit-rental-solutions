@@ -25,53 +25,51 @@ const ANNOUNCEMENT_KEY = "announcement-dismissed-v2";
    • "CHOICE" pill in gold — unmissable in any mode
    • "CREDIT & RENTAL SOLUTIONS" in foreground — adapts cleanly
    ───────────────────────────────────────────────────────────────────────────── */
+/* Brand constants — never affected by light/dark theme flips */
 const NAVY = "hsl(222 47% 11%)";
-const GOLD  = "hsl(45 93% 47%)";
+const GOLD = "hsl(45 90% 50%)";
+const SERIF = "'Playfair Display', Georgia, serif";
 
 function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const cfg = {
-    sm: { icon: "w-8 h-8",   pill: "text-[11px] px-2 py-0.5", name: "text-[13px]", gap: "gap-2"   },
-    md: { icon: "w-9 h-9",   pill: "text-[12px] px-2 py-0.5", name: "text-[14px]", gap: "gap-2.5" },
-    lg: { icon: "w-11 h-11", pill: "text-[14px] px-2.5 py-1", name: "text-[16px]", gap: "gap-3"   },
+    sm: { icon: "w-8 h-8",   cSize: "text-lg",   name: "text-[18px]", sub: "text-[9px]",  gap: "gap-2.5" },
+    md: { icon: "w-10 h-10", cSize: "text-xl",   name: "text-[21px]", sub: "text-[10px]", gap: "gap-3"   },
+    lg: { icon: "w-12 h-12", cSize: "text-2xl",  name: "text-[25px]", sub: "text-[11px]", gap: "gap-3.5" },
   }[size];
 
   return (
     <div className={`flex items-center ${cfg.gap} select-none`}>
-      {/* Icon: navy box, gold letter — maximum contrast on any bg */}
+
+      {/* Icon — navy tile, gold C — readable on any background */}
       <div
-        className={`${cfg.icon} rounded-xl shrink-0 flex items-center justify-center shadow-md`}
-        style={{ background: NAVY }}
+        className={`${cfg.icon} rounded-xl shrink-0 flex items-center justify-center`}
+        style={{ background: NAVY, boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
       >
         <span
-          className="font-black leading-none"
-          style={{ color: GOLD, fontSize: "55%", fontFamily: "Georgia, serif" }}
+          className={`${cfg.cSize} font-black leading-none`}
+          style={{ color: GOLD, fontFamily: SERIF }}
         >
           C
         </span>
       </div>
 
-      {/* Wordmark stack */}
-      <div className="flex flex-col leading-none gap-[3px]">
-        {/* Row 1: gold pill + "Credit" */}
-        <div className="flex items-baseline gap-1.5">
-          <span
-            className={`${cfg.pill} font-black tracking-wider rounded uppercase leading-none`}
-            style={{ background: GOLD, color: NAVY, fontFamily: "Georgia, serif" }}
-          >
-            Choice
-          </span>
-          <span
-            className={`${cfg.name} font-bold tracking-tight text-foreground`}
-            style={{ fontFamily: "Georgia, serif" }}
-          >
-            Credit
-          </span>
+      {/* Text block */}
+      <div className="flex flex-col leading-none">
+        {/* Main wordmark — one bold line */}
+        <div
+          className={`${cfg.name} font-black tracking-tight leading-tight`}
+          style={{ fontFamily: SERIF }}
+        >
+          <span style={{ color: GOLD }}>Choice</span>
+          {/* text-foreground adapts: dark navy in light mode, near-white in dark mode */}
+          <span className="text-foreground"> Credit</span>
         </div>
-        {/* Row 2: small subtitle */}
-        <span className="text-[9px] font-semibold tracking-[0.2em] uppercase text-muted-foreground">
+        {/* Subtitle — muted-foreground adapts cleanly in both modes */}
+        <div className={`${cfg.sub} font-semibold uppercase tracking-[0.18em] mt-[3px] text-muted-foreground`}>
           &amp; Rental Solutions
-        </span>
+        </div>
       </div>
+
     </div>
   );
 }
