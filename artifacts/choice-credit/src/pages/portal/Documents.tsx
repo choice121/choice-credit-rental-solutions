@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useListMyDocuments, useUploadDocument } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { FileText, Upload, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 
@@ -13,59 +15,90 @@ export default function Documents() {
   const { data: documents, isLoading, refetch } = useListMyDocuments();
   const uploadDocument = useUploadDocument();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    
-    // Simulate file upload delay
-    setTimeout(() => {
-      uploadDocument.mutate({
-        data: {
-          name: file.name,
-          fileType: file.type,
-          fileUrl: `https://fake-storage.com/${file.name}`
-        }
-      }, {
-        onSuccess: () => {
-          toast({
-            title: "Document Uploaded",
-            description: "Your document has been submitted for review."
-          });
-          refetch();
-          setIsUploading(false);
-          // Reset input
-          if (e.target) e.target.value = '';
-        },
-        onError: () => {
-          toast({
-            title: "Upload Failed",
-            description: "There was an error uploading your document.",
-            variant: "destructive"
-          });
-          setIsUploading(false);
-        }
+    if (!supabase) {
+      toast({
+        title: "Storage not configured",
+        description: "File uploads require Supabase to be configured. Contact support.",
+        variant: "destructive",
       });
-    }, 1500);
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "bin";
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const storagePath = `${user?.id ?? "anon"}/${Date.now()}-${safeFileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("documents")
+        .upload(storagePath, file, { upsert: false, contentType: file.type || "application/octet-stream" });
+
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("documents")
+        .getPublicUrl(uploadData.path);
+
+      uploadDocument.mutate(
+        {
+          data: {
+            name: file.name,
+            fileType: file.type || "application/octet-stream",
+            fileUrl: publicUrl,
+          },
+        },
+        {
+          onSuccess: () => {
+            toast({
+              title: "Document Uploaded",
+              description: "Your document has been submitted for review.",
+            });
+            refetch();
+            setIsUploading(false);
+            if (e.target) e.target.value = "";
+          },
+          onError: () => {
+            toast({
+              title: "Upload Failed",
+              description: "There was an error saving your document record.",
+              variant: "destructive",
+            });
+            setIsUploading(false);
+          },
+        }
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
+      toast({ title: "Upload Failed", description: msg, variant: "destructive" });
+      setIsUploading(false);
+      if (e.target) e.target.value = "";
+    }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved': return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-      case 'rejected': return <AlertCircle className="w-4 h-4 text-destructive" />;
-      case 'reviewing': return <Clock className="w-4 h-4 text-primary" />;
+      case "approved": return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case "rejected": return <AlertCircle className="w-4 h-4 text-destructive" />;
+      case "reviewing": return <Clock className="w-4 h-4 text-primary" />;
       default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'approved': return <Badge className="bg-green-500">Approved</Badge>;
-      case 'rejected': return <Badge variant="destructive">Rejected</Badge>;
-      case 'reviewing': return <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20">Reviewing</Badge>;
+      case "approved": return <Badge className="bg-green-500">Approved</Badge>;
+      case "rejected": return <Badge variant="destructive">Rejected</Badge>;
+      case "reviewing": return <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20">Reviewing</Badge>;
       default: return <Badge variant="outline">Pending</Badge>;
     }
   };
@@ -79,11 +112,12 @@ export default function Documents() {
         </div>
         <div>
           <div className="relative">
-            <Input 
-              type="file" 
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+            <Input
+              type="file"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               onChange={handleFileUpload}
               disabled={isUploading}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"
             />
             <Button disabled={isUploading} className="w-full md:w-auto">
               <Upload className="w-4 h-4 mr-2" />
@@ -101,7 +135,7 @@ export default function Documents() {
         <CardContent>
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse" />
               ))}
             </div>
@@ -113,16 +147,23 @@ export default function Documents() {
             </div>
           ) : (
             <div className="divide-y">
-              {documents.map(doc => (
+              {documents.map((doc) => (
                 <div key={doc.id} className="py-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center shrink-0">
                       <FileText className="w-5 h-5 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-medium truncate">{doc.name}</h4>
+                      <a
+                        href={doc.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium truncate hover:underline text-foreground block"
+                      >
+                        {doc.name}
+                      </a>
                       <p className="text-xs text-muted-foreground">
-                        Uploaded {format(new Date(doc.uploadedAt), 'MMM d, yyyy')}
+                        Uploaded {format(new Date(doc.uploadedAt), "MMM d, yyyy")}
                       </p>
                       {doc.advisorNotes && (
                         <p className="text-sm mt-1 text-muted-foreground bg-muted p-2 rounded">
@@ -132,6 +173,7 @@ export default function Documents() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
+                    {getStatusIcon(doc.status)}
                     {getStatusBadge(doc.status)}
                   </div>
                 </div>

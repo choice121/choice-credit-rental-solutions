@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect } from "react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -116,6 +117,17 @@ export default function Book() {
       packageId: defaultPackageId
     }
   });
+
+  // Auto-select the matching package when packages load and a ?service= slug is present
+  useEffect(() => {
+    if (!packages || !serviceSlug || defaultPackageId) return;
+    const match = (packages as { id: string; slug?: string | null }[]).find(
+      (p) => p.slug === serviceSlug
+    );
+    if (match) {
+      form.setValue("packageId", match.id, { shouldValidate: false });
+    }
+  }, [packages, serviceSlug, defaultPackageId, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Map sentinel "none" back to undefined so the backend receives null/undefined, not an invalid UUID

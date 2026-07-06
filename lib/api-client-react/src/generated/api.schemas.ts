@@ -500,3 +500,16 @@ export type ListLeadsParams = {
 status?: string;
 };
 
+export interface CaseInput {
+  packageName: string;
+  /** @nullable */
+  advisorName?: string | null;
+}
+
+export interface InvoiceInput {
+  packageName: string;
+  amount: number;
+  /** @nullable */
+  caseId?: string | null;
+}
+

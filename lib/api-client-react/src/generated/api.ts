@@ -29,6 +29,7 @@ import type {
   AdminMessageInput,
   ApprovalPlan,
   Case,
+  CaseInput,
   Checklist,
   ClientProfile,
   Consultation,
@@ -42,6 +43,7 @@ import type {
   GetTradelineEstimateParams,
   HealthStatus,
   Invoice,
+  InvoiceInput,
   InvoiceStatusUpdate,
   LeadUpdate,
   ListAdminClientsParams,
@@ -2641,6 +2643,58 @@ export function useGetRevenueOverview<TData = Awaited<ReturnType<typeof getReven
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const createAdminCase = async (id: string, data: CaseInput, options?: RequestInit): Promise<Case> => {
+  return customFetch<Case>(`/api/admin/clients/${id}/case`, {
+    ...options,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+};
+
+export const useCreateAdminCase = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createAdminCase>>, TError, { id: string; data: BodyType<CaseInput> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof createAdminCase>>, TError, { id: string; data: BodyType<CaseInput> }, TContext> => {
+  const mutationKey = ['createAdminCase'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminCase>>, { id: string; data: BodyType<CaseInput> }> = (props) => {
+    const { id, data } = props ?? {};
+    return createAdminCase(id, data, requestOptions);
+  };
+
+  return useMutation({ mutationFn, ...mutationOptions });
+};
+
+export const createAdminInvoice = async (id: string, data: InvoiceInput, options?: RequestInit): Promise<Invoice> => {
+  return customFetch<Invoice>(`/api/admin/clients/${id}/invoices`, {
+    ...options,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+};
+
+export const useCreateAdminInvoice = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createAdminInvoice>>, TError, { id: string; data: BodyType<InvoiceInput> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof createAdminInvoice>>, TError, { id: string; data: BodyType<InvoiceInput> }, TContext> => {
+  const mutationKey = ['createAdminInvoice'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminInvoice>>, { id: string; data: BodyType<InvoiceInput> }> = (props) => {
+    const { id, data } = props ?? {};
+    return createAdminInvoice(id, data, requestOptions);
+  };
+
+  return useMutation({ mutationFn, ...mutationOptions });
+};
 
 
 

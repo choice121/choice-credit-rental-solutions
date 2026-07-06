@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Building2, LayoutDashboard, FileText, CheckSquare, MessageSquare, CreditCard, LogOut } from "lucide-react";
+import { Building2, LayoutDashboard, FileText, CheckSquare, MessageSquare, CreditCard, Settings, LogOut } from "lucide-react";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const { signOut } = useAuth();
@@ -13,6 +13,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     { href: "/portal/plan", label: "Approval Plan", icon: CheckSquare },
     { href: "/portal/messages", label: "Messages", icon: MessageSquare },
     { href: "/portal/billing", label: "Billing", icon: CreditCard },
+    { href: "/portal/settings", label: "Settings", icon: Settings },
   ];
 
   return (

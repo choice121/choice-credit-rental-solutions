@@ -27,6 +27,7 @@ const PortalDocuments = lazy(() => import("@/pages/portal/Documents"));
 const PortalPlan = lazy(() => import("@/pages/portal/Plan"));
 const PortalMessages = lazy(() => import("@/pages/portal/Messages"));
 const PortalBilling = lazy(() => import("@/pages/portal/Billing"));
+const PortalSettings = lazy(() => import("@/pages/portal/Settings"));
 
 // Admin pages
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
@@ -94,6 +95,7 @@ function Router() {
         <Route path="/portal/plan">{() => <ProtectedRoute component={PortalPlan} />}</Route>
         <Route path="/portal/messages">{() => <ProtectedRoute component={PortalMessages} />}</Route>
         <Route path="/portal/billing">{() => <ProtectedRoute component={PortalBilling} />}</Route>
+        <Route path="/portal/settings">{() => <ProtectedRoute component={PortalSettings} />}</Route>
 
         {/* Admin */}
         <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} adminOnly />}</Route>

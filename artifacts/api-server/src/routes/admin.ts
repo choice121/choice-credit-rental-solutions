@@ -461,6 +461,105 @@ router.put("/invoices/:id/status", requireAdmin, async (req: AuthRequest, res) =
   }
 });
 
+// POST /admin/clients/:id/case — manually create a case for a client
+router.post("/clients/:id/case", requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const CaseSchema = z.object({
+      packageName: z.string().min(1).max(200),
+      advisorName: z.string().max(100).optional().nullable(),
+    });
+    const parsed = CaseSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.errors[0].message });
+      return;
+    }
+    const { packageName, advisorName } = parsed.data;
+
+    const { data: profile } = await supabase.from("profiles").select("id").eq("id", id).single();
+    if (!profile) {
+      res.status(404).json({ error: "Client not found" });
+      return;
+    }
+
+    const { data, error } = await supabase.from("cases").insert({
+      client_id: id,
+      package_name: packageName,
+      advisor_name: advisorName || null,
+      status: "intake",
+    }).select().single();
+
+    if (error) {
+      console.error("Create case error:", error);
+      res.status(500).json({ error: INTERNAL_ERROR });
+      return;
+    }
+
+    await supabase.from("activity_log").insert({
+      type: "case_created",
+      description: `Case created: ${packageName}`,
+      client_id: id,
+    });
+
+    res.status(201).json({
+      id: data.id, clientId: data.client_id, packageName: data.package_name,
+      status: data.status, advisorName: data.advisor_name,
+      notes: data.notes, createdAt: data.created_at, updatedAt: data.updated_at,
+    });
+  } catch (err) {
+    console.error("Create case error:", err);
+    res.status(500).json({ error: INTERNAL_ERROR });
+  }
+});
+
+// POST /admin/clients/:id/invoices — create an invoice for a client
+router.post("/clients/:id/invoices", requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const InvoiceSchema = z.object({
+      packageName: z.string().min(1).max(200),
+      amount: z.number().positive().max(100000),
+      caseId: z.string().uuid().optional().nullable(),
+    });
+    const parsed = InvoiceSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.errors[0].message });
+      return;
+    }
+    const { packageName, amount, caseId } = parsed.data;
+
+    const { data, error } = await supabase.from("invoices").insert({
+      client_id: id,
+      package_name: packageName,
+      amount,
+      case_id: caseId || null,
+      status: "pending",
+    }).select().single();
+
+    if (error) {
+      console.error("Create invoice error:", error);
+      res.status(500).json({ error: INTERNAL_ERROR });
+      return;
+    }
+
+    await supabase.from("activity_log").insert({
+      type: "invoice_created",
+      description: `Invoice created: ${packageName} — $${amount}`,
+      client_id: id,
+    });
+
+    res.status(201).json({
+      id: data.id, clientId: data.client_id, caseId: data.case_id,
+      packageName: data.package_name, amount: data.amount,
+      status: data.status, paymentMethod: data.payment_method,
+      createdAt: data.created_at, paidAt: data.paid_at,
+    });
+  } catch (err) {
+    console.error("Create invoice error:", err);
+    res.status(500).json({ error: INTERNAL_ERROR });
+  }
+});
+
 // GET /admin/revenue
 router.get("/revenue", requireAdmin, async (req: AuthRequest, res) => {
   try {
