@@ -31,12 +31,19 @@ function getProofClient(score: number): { initials: string; bg: string; name: st
 }
 
 // Read initial values from URL search params (for shareable links)
+// Uses ?? instead of || so that shared values of 0 are preserved correctly
 function getInitialParams(): { score: number; utilization: number; age: number } {
   const params = new URLSearchParams(window.location.search);
+  const parseParam = (key: string, fallback: number, min: number, max: number) => {
+    const raw = params.get(key);
+    const parsed = raw !== null ? Number(raw) : null;
+    const value = parsed !== null && !isNaN(parsed) ? parsed : fallback;
+    return Math.min(max, Math.max(min, value));
+  };
   return {
-    score: Math.min(850, Math.max(300, Number(params.get("score")) || 580)),
-    utilization: Math.min(100, Math.max(0, Number(params.get("util")) || 80)),
-    age: Math.min(20, Math.max(0, Number(params.get("age")) || 2)),
+    score:       parseParam("score", 580, 300, 850),
+    utilization: parseParam("util",  80,  0,   100),
+    age:         parseParam("age",   2,   0,   20),
   };
 }
 

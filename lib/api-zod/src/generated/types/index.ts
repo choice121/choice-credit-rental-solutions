@@ -10,6 +10,8 @@ export * from './activityItem';
 export * from './addOn';
 export * from './addOnInput';
 export * from './addOnStatus';
+export * from './addOnUpdate';
+export * from './addOnUpdateStatus';
 export * from './adminClient';
 export * from './adminClientDetail';
 export * from './adminClientUpdate';

@@ -68,6 +68,21 @@ export interface AddOnInput {
   notes?: string | null;
 }
 
+export type AddOnUpdateStatus = typeof AddOnUpdateStatus[keyof typeof AddOnUpdateStatus];
+
+
+export const AddOnUpdateStatus = {
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface AddOnUpdate {
+  status?: AddOnUpdateStatus;
+  /** @nullable */
+  notes?: string | null;
+}
+
 export interface ConsultationInput {
   fullName: string;
   email: string;

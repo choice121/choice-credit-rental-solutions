@@ -5,8 +5,16 @@
 
 -- ── 1. Extend packages table for all service tiers ──────────
 
--- Drop restrictive tier check constraint to allow full category set
+-- Drop restrictive tier check constraint (only allowed starter/standard/premium)
+-- and replace with a broader constraint covering all service categories
 ALTER TABLE packages DROP CONSTRAINT IF EXISTS packages_tier_check;
+ALTER TABLE packages ADD CONSTRAINT packages_tier_check
+  CHECK (tier IN (
+    'starter', 'standard', 'premium',
+    'profile_standard', 'profile_expedited',
+    'done_for_you',
+    'addon'
+  ));
 
 -- Allow null price for variable-pricing services
 ALTER TABLE packages ALTER COLUMN price DROP NOT NULL;

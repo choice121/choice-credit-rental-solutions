@@ -99,6 +99,79 @@ export const AddMyAddOnResponse = zod.object({
 
 
 /**
+ * @summary List add-ons for a specific client case (admin only)
+ */
+export const AdminListCaseAddOnsParams = zod.object({
+  "caseId": zod.coerce.string()
+})
+
+export const AdminListCaseAddOnsResponseItem = zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "packageId": zod.string().nullish(),
+  "name": zod.string(),
+  "price": zod.number().nullish(),
+  "status": zod.enum(['active', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "addedAt": zod.string(),
+  "updatedAt": zod.string().optional()
+})
+export const AdminListCaseAddOnsResponse = zod.array(AdminListCaseAddOnsResponseItem)
+
+
+/**
+ * @summary Add an add-on to any client's case (admin only)
+ */
+export const AdminCreateCaseAddOnParams = zod.object({
+  "caseId": zod.coerce.string()
+})
+
+export const AdminCreateCaseAddOnBody = zod.object({
+  "packageId": zod.string().nullish(),
+  "name": zod.string(),
+  "price": zod.number().nullish(),
+  "notes": zod.string().nullish()
+})
+
+export const AdminCreateCaseAddOnResponse = zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "packageId": zod.string().nullish(),
+  "name": zod.string(),
+  "price": zod.number().nullish(),
+  "status": zod.enum(['active', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "addedAt": zod.string(),
+  "updatedAt": zod.string().optional()
+})
+
+
+/**
+ * @summary Update an add-on's status or notes (admin only)
+ */
+export const AdminUpdateAddOnParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdateAddOnBody = zod.object({
+  "status": zod.enum(['active', 'completed', 'cancelled']).optional(),
+  "notes": zod.string().nullish()
+})
+
+export const AdminUpdateAddOnResponse = zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "packageId": zod.string().nullish(),
+  "name": zod.string(),
+  "price": zod.number().nullish(),
+  "status": zod.enum(['active', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "addedAt": zod.string(),
+  "updatedAt": zod.string().optional()
+})
+
+
+/**
  * @summary Book a free consultation
  */
 export const BookConsultationBody = zod.object({

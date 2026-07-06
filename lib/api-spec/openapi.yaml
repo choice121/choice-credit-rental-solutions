@@ -114,6 +114,93 @@ paths:
         "404":
           description: No active case found
 
+  /add-ons/admin/{caseId}:
+    get:
+      operationId: adminListCaseAddOns
+      tags: [admin]
+      summary: List add-ons for a specific client case (admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: caseId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Add-ons for the case
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AddOn"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    post:
+      operationId: adminCreateCaseAddOn
+      tags: [admin]
+      summary: Add an add-on to any client's case (admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: caseId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddOnInput"
+      responses:
+        "201":
+          description: Add-on created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddOn"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
+  /add-ons/admin/item/{id}:
+    put:
+      operationId: adminUpdateAddOn
+      tags: [admin]
+      summary: Update an add-on's status or notes (admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddOnUpdate"
+      responses:
+        "200":
+          description: Updated add-on
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddOn"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
   /consultations:
     post:
       operationId: bookConsultation
@@ -683,6 +770,15 @@ components:
           type: string
         price:
           type: ["number", "null"]
+        notes:
+          type: ["string", "null"]
+
+    AddOnUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [active, completed, cancelled]
         notes:
           type: ["string", "null"]
 

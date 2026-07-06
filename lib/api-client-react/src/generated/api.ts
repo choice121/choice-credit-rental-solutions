@@ -22,6 +22,7 @@ import type {
 import type {
   AddOn,
   AddOnInput,
+  AddOnUpdate,
   AdminClient,
   AdminClientDetail,
   AdminClientUpdate,
@@ -468,6 +469,227 @@ export const useAddMyAddOn = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getAddMyAddOnMutationOptions(options));
+    }
+
+export const getAdminListCaseAddOnsUrl = (caseId: string,) => {
+
+
+
+
+  return `/api/add-ons/admin/${caseId}`
+}
+
+/**
+ * @summary List add-ons for a specific client case (admin only)
+ */
+export const adminListCaseAddOns = async (caseId: string, options?: RequestInit): Promise<AddOn[]> => {
+
+  return customFetch<AddOn[]>(getAdminListCaseAddOnsUrl(caseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListCaseAddOnsQueryKey = (caseId: string,) => {
+    return [
+    `/api/add-ons/admin/${caseId}`
+    ] as const;
+    }
+
+
+export const getAdminListCaseAddOnsQueryOptions = <TData = Awaited<ReturnType<typeof adminListCaseAddOns>>, TError = ErrorType<void>>(caseId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListCaseAddOns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListCaseAddOnsQueryKey(caseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListCaseAddOns>>> = ({ signal }) => adminListCaseAddOns(caseId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListCaseAddOns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListCaseAddOnsQueryResult = NonNullable<Awaited<ReturnType<typeof adminListCaseAddOns>>>
+export type AdminListCaseAddOnsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List add-ons for a specific client case (admin only)
+ */
+
+export function useAdminListCaseAddOns<TData = Awaited<ReturnType<typeof adminListCaseAddOns>>, TError = ErrorType<void>>(
+ caseId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListCaseAddOns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListCaseAddOnsQueryOptions(caseId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAdminCreateCaseAddOnUrl = (caseId: string,) => {
+
+
+
+
+  return `/api/add-ons/admin/${caseId}`
+}
+
+/**
+ * @summary Add an add-on to any client's case (admin only)
+ */
+export const adminCreateCaseAddOn = async (caseId: string,
+    addOnInput: AddOnInput, options?: RequestInit): Promise<AddOn> => {
+
+  return customFetch<AddOn>(getAdminCreateCaseAddOnUrl(caseId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addOnInput)
+  }
+);}
+
+
+
+
+
+export const getAdminCreateCaseAddOnMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreateCaseAddOn>>, TError,{caseId: string;data: BodyType<AddOnInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCreateCaseAddOn>>, TError,{caseId: string;data: BodyType<AddOnInput>}, TContext> => {
+
+const mutationKey = ['adminCreateCaseAddOn'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCreateCaseAddOn>>, {caseId: string;data: BodyType<AddOnInput>}> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  adminCreateCaseAddOn(caseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCreateCaseAddOnMutationResult = NonNullable<Awaited<ReturnType<typeof adminCreateCaseAddOn>>>
+    export type AdminCreateCaseAddOnMutationBody = BodyType<AddOnInput>
+    export type AdminCreateCaseAddOnMutationError = ErrorType<void>
+
+    /**
+ * @summary Add an add-on to any client's case (admin only)
+ */
+export const useAdminCreateCaseAddOn = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreateCaseAddOn>>, TError,{caseId: string;data: BodyType<AddOnInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminCreateCaseAddOn>>,
+        TError,
+        {caseId: string;data: BodyType<AddOnInput>},
+        TContext
+      > => {
+      return useMutation(getAdminCreateCaseAddOnMutationOptions(options));
+    }
+
+export const getAdminUpdateAddOnUrl = (id: string,) => {
+
+
+
+
+  return `/api/add-ons/admin/item/${id}`
+}
+
+/**
+ * @summary Update an add-on's status or notes (admin only)
+ */
+export const adminUpdateAddOn = async (id: string,
+    addOnUpdate: AddOnUpdate, options?: RequestInit): Promise<AddOn> => {
+
+  return customFetch<AddOn>(getAdminUpdateAddOnUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addOnUpdate)
+  }
+);}
+
+
+
+
+
+export const getAdminUpdateAddOnMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateAddOn>>, TError,{id: string;data: BodyType<AddOnUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdateAddOn>>, TError,{id: string;data: BodyType<AddOnUpdate>}, TContext> => {
+
+const mutationKey = ['adminUpdateAddOn'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdateAddOn>>, {id: string;data: BodyType<AddOnUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminUpdateAddOn(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdateAddOnMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdateAddOn>>>
+    export type AdminUpdateAddOnMutationBody = BodyType<AddOnUpdate>
+    export type AdminUpdateAddOnMutationError = ErrorType<void>
+
+    /**
+ * @summary Update an add-on's status or notes (admin only)
+ */
+export const useAdminUpdateAddOn = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateAddOn>>, TError,{id: string;data: BodyType<AddOnUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdateAddOn>>,
+        TError,
+        {id: string;data: BodyType<AddOnUpdate>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdateAddOnMutationOptions(options));
     }
 
 export const getBookConsultationUrl = () => {
