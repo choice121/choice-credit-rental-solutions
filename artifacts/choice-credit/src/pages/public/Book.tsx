@@ -101,6 +101,7 @@ export default function Book() {
 
   const searchParams = new URLSearchParams(window.location.search);
   const defaultPackageId = searchParams.get("package") || undefined;
+  const serviceSlug = searchParams.get("service") || undefined;
   const challengeSlug = searchParams.get("challenge") || undefined;
   const matchedChallenge = RENTER_CHALLENGES.find((c) => c.slug === challengeSlug);
 
@@ -117,7 +118,12 @@ export default function Book() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    bookConsultation.mutate({ data: values }, {
+    // Map sentinel "none" back to undefined so the backend receives null/undefined, not an invalid UUID
+    const payload = {
+      ...values,
+      packageId: values.packageId === "none" ? undefined : values.packageId,
+    };
+    bookConsultation.mutate({ data: payload }, {
       onSuccess: () => { setLocation("/book/confirmation"); },
       onError: () => {
         toast({
@@ -151,7 +157,17 @@ export default function Book() {
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
           {/* ── Form (left, takes 3 of 5 cols) ── */}
           <div className="lg:col-span-3">
-            {matchedChallenge && (
+            {serviceSlug && !matchedChallenge && (
+          <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+            <p className="text-sm text-foreground/80">
+              You selected <span className="font-semibold capitalize">{serviceSlug.replace(/-/g, " ")}</span>. 
+              Your advisor will review your interest in this service during your consultation.
+            </p>
+          </div>
+        )}
+
+        {matchedChallenge && (
               <div className="mb-8 rounded-xl border border-border overflow-hidden">
                 <div className={`bg-gradient-to-r ${matchedChallenge.accentColor} px-5 py-3 flex items-center gap-3`}>
                   <div className="text-white">{matchedChallenge.icon}</div>

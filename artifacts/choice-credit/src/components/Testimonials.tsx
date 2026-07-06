@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -129,17 +129,25 @@ export default function Testimonials({ compact = false }: { compact?: boolean })
   const [active, setActive] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const count = TESTIMONIALS.length;
+  const mountedRef = useRef(true);
+
+  // Track mounted state so timer callbacks don't update unmounted component
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const go = useCallback((next: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
     setTimeout(() => {
+      if (!mountedRef.current) return;
       setActive((next + count) % count);
       setIsAnimating(false);
     }, 200);
   }, [isAnimating, count]);
 
-  // Auto-advance
+  // Auto-advance every 6 seconds
   useEffect(() => {
     const timer = setInterval(() => go(active + 1), 6000);
     return () => clearInterval(timer);

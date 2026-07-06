@@ -77,7 +77,7 @@ export default function FAQ() {
                 </button>
                 <div
                   className="overflow-hidden transition-all duration-300 ease-in-out"
-                  style={{ maxHeight: isOpen ? "500px" : "0px", opacity: isOpen ? 1 : 0 }}
+                  style={{ maxHeight: isOpen ? "1500px" : "0px", opacity: isOpen ? 1 : 0 }}
                 >
                   <p className="px-6 pb-6 text-muted-foreground leading-relaxed text-sm">
                     {faq.a}
