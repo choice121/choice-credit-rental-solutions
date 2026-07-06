@@ -1,16 +1,32 @@
 ---
 name: Supabase backend pattern
-description: How auth and DB access work in this project (no Drizzle, service role client, JWT auth middleware).
+description: How the backend connects to Supabase, how auth works, and key DB schema decisions made during setup.
 ---
 
-## Rule
-This project does NOT use Drizzle ORM. All database operations in the Express backend use `@supabase/supabase-js` with the service role key.
+## Connection pattern
+- Backend uses service role client directly (lib imported from `artifacts/api-server/src/lib/supabase.ts`)
+- Frontend uses anon key via AuthProvider
+- JWT validated in auth-middleware with anon key (`requireAuth`)
+- Admin guard via `requireAdmin` (checks `req.userRole === "admin"` set from `user.app_metadata.role`)
+- `AuthRequest` extends Request with `userId?: string` and `userRole?: string` — NOT `user` — use `req.userId!` not `req.user!.id`
 
-- Backend: `artifacts/api-server/src/lib/supabase.ts` — singleton service role client
-- Frontend: `artifacts/choice-credit/src/lib/supabase.ts` — anon key browser client
-- Auth middleware: validates JWTs by calling `client.auth.getUser(token)` using the anon key (creates a per-request Supabase client)
-- User role is stored in `app_metadata.role` or `user_metadata.role` on the Supabase user object
+## Required secrets
+- `SUPABASE_URL` — non-sensitive, set as shared env var
+- `VITE_SUPABASE_URL` — non-sensitive, set as shared env var
+- `SUPABASE_SERVICE_ROLE_KEY` — secret
+- `SUPABASE_ANON_KEY` — secret
+- `VITE_SUPABASE_ANON_KEY` — secret
 
-**Why:** The user explicitly chose Supabase for both auth and DB. Using the service role client in the backend bypasses RLS for admin operations while the frontend uses RLS through the anon key.
+## packages table schema (as of 2026-07-06)
+- Columns added: `slug TEXT`, `category TEXT`, `price_label TEXT`
+- `price` is nullable (for variable-price services like "Varies" or "$2,500–$2,800")
+- `tier` CHECK constraint expanded to: `starter | standard | premium | profile_standard | profile_expedited | done_for_you | addon`
+- 12 packages seeded across 4 categories
 
-**How to apply:** For new backend routes, import `supabase` from `../lib/supabase` and use the `requireAuth` / `requireAdmin` middleware from `../lib/auth-middleware`. Do not add Drizzle schema files.
+## add_ons table (case-level add-on tracking)
+- Created in migration `20260706_add_ons_and_full_packages.sql`
+- Columns: `id`, `case_id` (FK → cases), `package_id` (nullable FK → packages), `name`, `price`, `status` (active/completed/cancelled), `notes`, `added_at`, `updated_at`
+- Backend routes in `artifacts/api-server/src/routes/add-ons.ts`
+- Response shape: camelCase (`caseId`, `packageId`, `addedAt`, `updatedAt`) — always map with `mapAddOn()` helper
+
+**Why:** Supabase returns snake_case columns; OpenAPI/generated client expects camelCase. Always map DB rows in routes, never pass raw DB objects to the response.
