@@ -20,49 +20,55 @@ const navLinks = [
 const ANNOUNCEMENT_KEY = "announcement-dismissed-v2";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Logo — uses only tokens that are stable across light / dark:
-   • accent  = gold  (45 93% 47%) — never inverts
-   • foreground / muted-foreground — adapts, always readable
+   Logo
+   • Icon: hardcoded deep-navy square + gold "C" — pops on every background
+   • "CHOICE" pill in gold — unmissable in any mode
+   • "CREDIT & RENTAL SOLUTIONS" in foreground — adapts cleanly
    ───────────────────────────────────────────────────────────────────────────── */
+const NAVY = "hsl(222 47% 11%)";
+const GOLD  = "hsl(45 93% 47%)";
+
 function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const cfg = {
-    sm: { wrap: "gap-2",   icon: "w-7 h-7",  name: "text-[15px]", sub: "text-[8.5px]" },
-    md: { wrap: "gap-2.5", icon: "w-8 h-8",  name: "text-[17px]", sub: "text-[9.5px]" },
-    lg: { wrap: "gap-3",   icon: "w-10 h-10", name: "text-xl",    sub: "text-[11px]"  },
+    sm: { icon: "w-8 h-8",   pill: "text-[11px] px-2 py-0.5", name: "text-[13px]", gap: "gap-2"   },
+    md: { icon: "w-9 h-9",   pill: "text-[12px] px-2 py-0.5", name: "text-[14px]", gap: "gap-2.5" },
+    lg: { icon: "w-11 h-11", pill: "text-[14px] px-2.5 py-1", name: "text-[16px]", gap: "gap-3"   },
   }[size];
 
   return (
-    <div className={`flex items-center ${cfg.wrap} select-none`}>
-      {/* Icon badge — gold bg, always visible in light + dark */}
+    <div className={`flex items-center ${cfg.gap} select-none`}>
+      {/* Icon: navy box, gold letter — maximum contrast on any bg */}
       <div
-        className={`${cfg.icon} rounded-[10px] shrink-0 flex items-center justify-center`}
-        style={{ background: "hsl(45 93% 47%)" }}
+        className={`${cfg.icon} rounded-xl shrink-0 flex items-center justify-center shadow-md`}
+        style={{ background: NAVY }}
       >
-        {/* Simple "C" monogram — readable on gold in any mode */}
-        <svg viewBox="0 0 24 24" className="w-[58%] h-[58%]" fill="none">
-          <path
-            d="M17 8.5C15.5 6.7 13.4 5.8 11 6c-3.9.4-6.7 3.9-6.3 7.8.4 3.4 3.1 6 6.3 6.2 2.5.2 4.7-.9 6-2.8"
-            stroke="hsl(222 47% 11%)"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-        </svg>
+        <span
+          className="font-black leading-none"
+          style={{ color: GOLD, fontSize: "55%", fontFamily: "Georgia, serif" }}
+        >
+          C
+        </span>
       </div>
 
-      {/* Wordmark */}
-      <div className="flex flex-col leading-none">
-        <span
-          className={`${cfg.name} font-black tracking-tight leading-none`}
-          style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
-        >
-          {/* "Choice" always gold */}
-          <span style={{ color: "hsl(45 93% 47%)" }}>Choice</span>
-          {/* "Credit" always foreground */}
-          <span className="text-foreground"> Credit</span>
-        </span>
-        <span
-          className={`${cfg.sub} font-semibold tracking-[0.18em] uppercase text-muted-foreground mt-[2px]`}
-        >
+      {/* Wordmark stack */}
+      <div className="flex flex-col leading-none gap-[3px]">
+        {/* Row 1: gold pill + "Credit" */}
+        <div className="flex items-baseline gap-1.5">
+          <span
+            className={`${cfg.pill} font-black tracking-wider rounded uppercase leading-none`}
+            style={{ background: GOLD, color: NAVY, fontFamily: "Georgia, serif" }}
+          >
+            Choice
+          </span>
+          <span
+            className={`${cfg.name} font-bold tracking-tight text-foreground`}
+            style={{ fontFamily: "Georgia, serif" }}
+          >
+            Credit
+          </span>
+        </div>
+        {/* Row 2: small subtitle */}
+        <span className="text-[9px] font-semibold tracking-[0.2em] uppercase text-muted-foreground">
           &amp; Rental Solutions
         </span>
       </div>
@@ -130,10 +136,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
       {/* ── Sticky header ─────────────────────────────────────────────── */}
       <header
-        className={`sticky top-0 z-40 w-full bg-background/95 backdrop-blur transition-all duration-200 ${
+        className={`sticky top-0 z-40 w-full bg-background transition-all duration-200 ${
           scrolled
             ? "border-b border-border shadow-sm"
-            : "border-b border-transparent"
+            : "border-b border-border/50"
         }`}
       >
         <div className="container flex h-[62px] items-center justify-between gap-4 px-4 sm:px-6">
