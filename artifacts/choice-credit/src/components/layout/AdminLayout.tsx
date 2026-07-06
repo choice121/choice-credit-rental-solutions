@@ -12,6 +12,7 @@ import {
   DollarSign,
   LogOut,
   Menu,
+  ImagePlay,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/admin/leads", label: "Leads", icon: UserPlus },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
+  { href: "/admin/image-generator", label: "Image Generator", icon: ImagePlay },
 ];
 
 function NavItem({ href, label, icon: Icon, location, onClick }: {
