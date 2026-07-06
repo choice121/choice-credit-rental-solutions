@@ -7,22 +7,28 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Route-level code splitting — each section loads independently
+// Public pages
 const Home = lazy(() => import("@/pages/public/Home"));
 const Services = lazy(() => import("@/pages/public/Services"));
 const Calculator = lazy(() => import("@/pages/public/Calculator"));
 const Book = lazy(() => import("@/pages/public/Book"));
 const BookConfirmation = lazy(() => import("@/pages/public/BookConfirmation"));
 const Contact = lazy(() => import("@/pages/public/Contact"));
+const About = lazy(() => import("@/pages/public/About"));
+const Blog = lazy(() => import("@/pages/public/Blog"));
+const Privacy = lazy(() => import("@/pages/public/Privacy"));
+const Terms = lazy(() => import("@/pages/public/Terms"));
 const Login = lazy(() => import("@/pages/public/Login"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
+// Portal pages
 const PortalDashboard = lazy(() => import("@/pages/portal/Dashboard"));
 const PortalDocuments = lazy(() => import("@/pages/portal/Documents"));
 const PortalPlan = lazy(() => import("@/pages/portal/Plan"));
 const PortalMessages = lazy(() => import("@/pages/portal/Messages"));
 const PortalBilling = lazy(() => import("@/pages/portal/Billing"));
 
+// Admin pages
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminClients = lazy(() => import("@/pages/admin/Clients"));
 const AdminClientDetail = lazy(() => import("@/pages/admin/ClientDetail"));
@@ -55,21 +61,10 @@ function ProtectedRoute({
 }) {
   const { user, isAdmin, loading } = useAuth();
 
-  if (loading) {
-    return <PageLoader />;
-  }
-
-  if (!user) {
-    return <Redirect to="/login" />;
-  }
-
-  if (adminOnly && !isAdmin) {
-    return <Redirect to="/portal" />;
-  }
-
-  if (!adminOnly && isAdmin) {
-    return <Redirect to="/admin" />;
-  }
+  if (loading) return <PageLoader />;
+  if (!user) return <Redirect to="/login" />;
+  if (adminOnly && !isAdmin) return <Redirect to="/portal" />;
+  if (!adminOnly && isAdmin) return <Redirect to="/admin" />;
 
   return <Component />;
 }
@@ -78,6 +73,7 @@ function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
+        {/* Public */}
         <Route path="/" component={Home} />
         <Route path="/services" component={Services} />
         <Route path="/tradeline-calculator" component={Calculator} />
@@ -85,42 +81,27 @@ function Router() {
         <Route path="/book/confirmation" component={BookConfirmation} />
         <Route path="/book" component={Book} />
         <Route path="/contact" component={Contact} />
+        <Route path="/about" component={About} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/blog/:slug">{() => <Blog />}</Route>
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
         <Route path="/login" component={Login} />
 
-        <Route path="/portal">
-          {() => <ProtectedRoute component={PortalDashboard} />}
-        </Route>
-        <Route path="/portal/documents">
-          {() => <ProtectedRoute component={PortalDocuments} />}
-        </Route>
-        <Route path="/portal/plan">
-          {() => <ProtectedRoute component={PortalPlan} />}
-        </Route>
-        <Route path="/portal/messages">
-          {() => <ProtectedRoute component={PortalMessages} />}
-        </Route>
-        <Route path="/portal/billing">
-          {() => <ProtectedRoute component={PortalBilling} />}
-        </Route>
+        {/* Client portal */}
+        <Route path="/portal">{() => <ProtectedRoute component={PortalDashboard} />}</Route>
+        <Route path="/portal/documents">{() => <ProtectedRoute component={PortalDocuments} />}</Route>
+        <Route path="/portal/plan">{() => <ProtectedRoute component={PortalPlan} />}</Route>
+        <Route path="/portal/messages">{() => <ProtectedRoute component={PortalMessages} />}</Route>
+        <Route path="/portal/billing">{() => <ProtectedRoute component={PortalBilling} />}</Route>
 
-        <Route path="/admin">
-          {() => <ProtectedRoute component={AdminDashboard} adminOnly />}
-        </Route>
-        <Route path="/admin/clients">
-          {() => <ProtectedRoute component={AdminClients} adminOnly />}
-        </Route>
-        <Route path="/admin/clients/:id">
-          {() => <ProtectedRoute component={AdminClientDetail} adminOnly />}
-        </Route>
-        <Route path="/admin/leads">
-          {() => <ProtectedRoute component={AdminLeads} adminOnly />}
-        </Route>
-        <Route path="/admin/messages">
-          {() => <ProtectedRoute component={AdminMessages} adminOnly />}
-        </Route>
-        <Route path="/admin/revenue">
-          {() => <ProtectedRoute component={AdminRevenue} adminOnly />}
-        </Route>
+        {/* Admin */}
+        <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} adminOnly />}</Route>
+        <Route path="/admin/clients">{() => <ProtectedRoute component={AdminClients} adminOnly />}</Route>
+        <Route path="/admin/clients/:id">{() => <ProtectedRoute component={AdminClientDetail} adminOnly />}</Route>
+        <Route path="/admin/leads">{() => <ProtectedRoute component={AdminLeads} adminOnly />}</Route>
+        <Route path="/admin/messages">{() => <ProtectedRoute component={AdminMessages} adminOnly />}</Route>
+        <Route path="/admin/revenue">{() => <ProtectedRoute component={AdminRevenue} adminOnly />}</Route>
 
         <Route component={NotFound} />
       </Switch>
