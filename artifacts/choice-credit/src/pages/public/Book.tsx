@@ -12,6 +12,8 @@ import { useBookConsultation, useListPackages } from "@workspace/api-client-reac
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { RENTER_CHALLENGES } from "@/components/RenterChallenges";
+import Testimonials from "@/components/Testimonials";
+import { CheckCircle2, Clock, Phone, Mail, Lock, Star } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
@@ -21,6 +23,75 @@ const formSchema = z.object({
   preferredTime: z.string().optional(),
   packageId: z.string().optional()
 });
+
+function TrustPanel() {
+  const steps = [
+    { icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />, text: "We review your submission within 24 hours" },
+    { icon: <Phone className="w-4 h-4 text-blue-500" />, text: "An advisor calls you to discuss your situation" },
+    { icon: <CheckCircle2 className="w-4 h-4 text-accent" />, text: "We present your personalized approval plan" },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* Mini testimonial */}
+      <div className="bg-primary/5 border border-primary/15 rounded-xl p-5">
+        <div className="flex gap-0.5 mb-3">
+          {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-accent text-accent" />)}
+        </div>
+        <p className="text-sm text-foreground/80 leading-relaxed italic mb-3">
+          "I had an eviction from 2021 that kept showing up on every background check. My advisor knew exactly how to handle it. I was in my new place in under 3 weeks. Worth every penny."
+        </p>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">DR</div>
+          <div>
+            <p className="text-xs font-semibold text-foreground">Destiny R.</p>
+            <p className="text-xs text-muted-foreground">Houston, TX · Approved in 17 days</p>
+          </div>
+        </div>
+      </div>
+
+      {/* What happens next */}
+      <div className="bg-card border rounded-xl p-5">
+        <h3 className="font-semibold text-sm text-foreground mb-4">What happens after you submit</h3>
+        <ol className="space-y-3">
+          {steps.map((s, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <div className="mt-0.5 shrink-0">{s.icon}</div>
+              <span className="text-sm text-muted-foreground">{s.text}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Response time */}
+      <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+        <Clock className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-emerald-800">Average response: under 24 hours</p>
+          <p className="text-xs text-emerald-600">Mon–Sat, 9AM–7PM EST</p>
+        </div>
+      </div>
+
+      {/* Contact info */}
+      <div className="space-y-2">
+        <a href="tel:18005550198" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
+          <Phone className="w-4 h-4 shrink-0" />
+          1 (800) 555-0198
+        </a>
+        <a href="mailto:support@choicecredit.com" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
+          <Mail className="w-4 h-4 shrink-0" />
+          support@choicecredit.com
+        </a>
+      </div>
+
+      {/* Privacy badge */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Lock className="w-3.5 h-3.5 shrink-0" />
+        Your information is 100% confidential and never shared.
+      </div>
+    </div>
+  );
+}
 
 export default function Book() {
   const { toast } = useToast();
@@ -46,12 +117,8 @@ export default function Book() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    bookConsultation.mutate({
-      data: values
-    }, {
-      onSuccess: () => {
-        setLocation("/book/confirmation");
-      },
+    bookConsultation.mutate({ data: values }, {
+      onSuccess: () => { setLocation("/book/confirmation"); },
       onError: () => {
         toast({
           title: "Error",
@@ -64,157 +131,188 @@ export default function Book() {
 
   return (
     <PublicLayout>
-      <div className="container max-w-3xl py-16 md:py-24">
-        <div className="text-center mb-12">
-          <h1 className="font-serif text-4xl font-bold mb-4">Request a Consultation</h1>
-          <p className="text-lg text-muted-foreground">
-            Take the first step toward approval. Tell us about your situation and we'll craft a plan.
+      {/* Hero strip */}
+      <div className="bg-primary py-12 md:py-16 text-center">
+        <div className="container max-w-3xl">
+          <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 text-accent px-3 py-1 rounded-full text-xs font-semibold mb-4">
+            <span>★★★★★</span>
+            <span className="text-primary-foreground/80">98% approval rate · 500+ families housed</span>
+          </div>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-primary-foreground mb-3">
+            Request a Free Consultation
+          </h1>
+          <p className="text-primary-foreground/70">
+            Tell us about your situation and we'll craft a plan to get you approved.
           </p>
         </div>
-
-        {matchedChallenge && (
-          <div className="mb-8 rounded-xl border border-border overflow-hidden">
-            <div className={`bg-gradient-to-r ${matchedChallenge.accentColor} px-5 py-3 flex items-center gap-3`}>
-              <div className="text-white">{matchedChallenge.icon}</div>
-              <div>
-                <p className="text-white font-semibold text-sm uppercase tracking-wide">{matchedChallenge.label}</p>
-                <p className="text-white/90 text-xs">{matchedChallenge.headline}</p>
-              </div>
-            </div>
-            <div className="bg-card px-5 py-3 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                We specialize in this. Your situation description is pre-filled below — edit it to match your details.
-              </p>
-              <span className="text-xs font-medium text-accent ml-4 shrink-0">✓ Matched</span>
-            </div>
-          </div>
-        )}
-
-        <Card className="shadow-lg border-t-4 border-t-primary">
-          <CardHeader>
-            <CardTitle>Your Information</CardTitle>
-            <CardDescription>All information is kept strictly confidential.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter your full name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="Your email address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(555) 123-4567" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="preferredTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Preferred Contact Time</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a time" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="morning">Morning (9AM - 12PM)</SelectItem>
-                            <SelectItem value="afternoon">Afternoon (12PM - 4PM)</SelectItem>
-                            <SelectItem value="evening">Evening (4PM - 7PM)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="packageId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Interested Package (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="I'm not sure yet" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">I'm not sure yet</SelectItem>
-                          {Array.isArray(packages) && packages.map(pkg => (
-                            <SelectItem key={pkg.id} value={pkg.id}>{pkg.name} - ${pkg.price}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="situation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Briefly describe your situation</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="I was recently denied for an apartment due to a past eviction and low credit score..."
-                          className="min-h-[120px] resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full h-12 text-base" disabled={bookConsultation.isPending}>
-                  {bookConsultation.isPending ? "Submitting..." : "Request Consultation"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
       </div>
+
+      <div className="container max-w-6xl py-14 md:py-20">
+        <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
+          {/* ── Form (left, takes 3 of 5 cols) ── */}
+          <div className="lg:col-span-3">
+            {matchedChallenge && (
+              <div className="mb-8 rounded-xl border border-border overflow-hidden">
+                <div className={`bg-gradient-to-r ${matchedChallenge.accentColor} px-5 py-3 flex items-center gap-3`}>
+                  <div className="text-white">{matchedChallenge.icon}</div>
+                  <div>
+                    <p className="text-white font-semibold text-sm uppercase tracking-wide">{matchedChallenge.label}</p>
+                    <p className="text-white/90 text-xs">{matchedChallenge.headline}</p>
+                  </div>
+                </div>
+                <div className="bg-card px-5 py-3 flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    We specialize in this. Your situation description is pre-filled below — edit it to match your details.
+                  </p>
+                  <span className="text-xs font-medium text-accent ml-4 shrink-0">✓ Matched</span>
+                </div>
+              </div>
+            )}
+
+            <Card className="shadow-md border-t-4 border-t-primary">
+              <CardHeader>
+                <CardTitle className="text-xl">Your Information</CardTitle>
+                <CardDescription>All information is kept strictly confidential.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your full name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="Your email address" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="(555) 123-4567" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="preferredTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Preferred Contact Time</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a time" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="morning">Morning (9AM - 12PM)</SelectItem>
+                                <SelectItem value="afternoon">Afternoon (12PM - 4PM)</SelectItem>
+                                <SelectItem value="evening">Evening (4PM - 7PM)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="packageId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Interested Package (Optional)</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="I'm not sure yet" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="none">I'm not sure yet</SelectItem>
+                              {Array.isArray(packages) && packages.map(pkg => (
+                                <SelectItem key={pkg.id} value={pkg.id}>{pkg.name} - ${pkg.price}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="situation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Briefly describe your situation</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="I was recently denied for an apartment due to a past eviction and low credit score..."
+                              className="min-h-[120px] resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full h-12 text-base"
+                      disabled={bookConsultation.isPending}
+                    >
+                      {bookConsultation.isPending ? "Submitting..." : "Request My Free Consultation"}
+                    </Button>
+
+                    <p className="text-xs text-muted-foreground text-center">
+                      By submitting, you agree to be contacted by a Choice Credit advisor.
+                      We never share your information.
+                    </p>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ── Trust panel (right, takes 2 of 5 cols) ── */}
+          <div className="lg:col-span-2 lg:sticky lg:top-24">
+            <TrustPanel />
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials below the form for reassurance */}
+      <Testimonials />
     </PublicLayout>
   );
 }

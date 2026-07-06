@@ -81,6 +81,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/services" component={Services} />
         <Route path="/tradeline-calculator" component={Calculator} />
+        <Route path="/calculator">{() => { window.location.replace("/tradeline-calculator"); return null; }}</Route>
         <Route path="/book/confirmation" component={BookConfirmation} />
         <Route path="/book" component={Book} />
         <Route path="/contact" component={Contact} />

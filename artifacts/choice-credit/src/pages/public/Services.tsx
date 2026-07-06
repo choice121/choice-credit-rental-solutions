@@ -2,7 +2,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home, ArrowRight } from "lucide-react";
+import { Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home, ArrowRight, Star } from "lucide-react";
 import { Link } from "wouter";
 
 const STATIC_PACKAGES = [
@@ -174,18 +174,63 @@ const ADDONS = [
   },
 ];
 
+// Mini testimonial strip for social proof at the top of services
+const MINI_TESTIMONIALS = [
+  { initials: "MT", bg: "bg-blue-600", quote: "Approved in 22 days — 524 score to Midtown 2BR", challenge: "Bad Credit" },
+  { initials: "DR", bg: "bg-violet-600", quote: "Eviction on file. Still got approved in 17 days.", challenge: "Eviction" },
+  { initials: "JK", bg: "bg-emerald-600", quote: "Freelancers with no pay stubs — townhome approved!", challenge: "Income" },
+];
+
 export default function Services() {
   return (
     <PublicLayout>
-      {/* Hero */}
-      <div className="bg-muted py-16 md:py-24">
-        <div className="container max-w-4xl text-center">
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Every Path to Approval, Covered.
+      {/* Hero — dark navy, matching home energy */}
+      <section className="relative overflow-hidden bg-primary py-20 md:py-28">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1560518846-cebc533b6271?auto=format&fit=crop&q=80&w=1600')",
+            opacity: 0.12,
+            mixBlendMode: "overlay",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/40" />
+        <div className="container max-w-4xl text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 text-accent px-4 py-1.5 rounded-full text-sm font-semibold mb-6">
+            <span>★★★★★</span>
+            <span className="text-primary-foreground/80">500+ clients approved</span>
+          </div>
+          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight">
+            Every Path to Approval,<br className="hidden sm:block" /> Covered.
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-primary-foreground/75 max-w-2xl mx-auto mb-8">
             From credit consulting to full done-for-you approvals — transparent pricing, real results.
           </p>
+          <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 h-13 px-8" asChild>
+            <Link href="/book">Get a Free Consultation</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Mini testimonial strip */}
+      <div className="bg-card border-b py-6">
+        <div className="container max-w-5xl">
+          <div className="grid sm:grid-cols-3 gap-4">
+            {MINI_TESTIMONIALS.map((t, i) => (
+              <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-muted/50">
+                <div className={`w-9 h-9 rounded-full ${t.bg} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                  {t.initials}
+                </div>
+                <div>
+                  <div className="flex gap-0.5 mb-1">
+                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3 h-3 fill-accent text-accent" />)}
+                  </div>
+                  <p className="text-xs text-foreground/80 italic">"{t.quote}"</p>
+                  <span className="text-[10px] text-muted-foreground mt-1 block">{t.challenge} challenge</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -209,7 +254,7 @@ export default function Services() {
             {STATIC_PACKAGES.map((pkg) => (
               <Card
                 key={pkg.slug}
-                className={`relative flex flex-col ${pkg.highlight ? "border-2 border-primary shadow-2xl md:scale-105 z-10" : ""}`}
+                className={`relative flex flex-col transition-shadow hover:shadow-xl ${pkg.highlight ? "border-2 border-primary shadow-2xl md:scale-105 z-10" : ""}`}
               >
                 {pkg.badge && (
                   <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-full text-sm font-bold tracking-wide uppercase ${pkg.highlight ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"}`}>
@@ -230,7 +275,7 @@ export default function Services() {
                   <ul className="space-y-3">
                     {pkg.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <Check className={`w-5 h-5 shrink-0 mt-0.5 ${pkg.highlight ? "text-accent" : "text-accent"}`} />
+                        <Check className="w-5 h-5 shrink-0 mt-0.5 text-accent" />
                         <span className="text-sm">{f}</span>
                       </li>
                     ))}
@@ -265,7 +310,7 @@ export default function Services() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {PROFILE_PACKAGES.map((pkg) => (
-              <Card key={pkg.name} className={`relative flex flex-col ${pkg.badge === "Fast Track" ? "border-2 border-accent shadow-xl" : ""}`}>
+              <Card key={pkg.name} className={`relative flex flex-col hover:shadow-lg transition-shadow ${pkg.badge === "Fast Track" ? "border-2 border-accent shadow-xl" : ""}`}>
                 {pkg.badge && (
                   <div className={`absolute top-0 right-6 -translate-y-1/2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${pkg.badge === "Fast Track" ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground border"}`}>
                     {pkg.badge}
@@ -325,7 +370,7 @@ export default function Services() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {DONE_FOR_YOU.map((svc) => (
-              <Card key={svc.name} className="flex flex-col border-2 border-border hover:border-primary/40 transition-colors shadow-sm">
+              <Card key={svc.name} className="flex flex-col border-2 border-border hover:border-primary/40 hover:shadow-xl transition-all shadow-sm">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${svc.iconBg}`}>
@@ -407,17 +452,19 @@ export default function Services() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-primary text-center">
-        <div className="container max-w-3xl">
+      <section className="py-20 bg-primary text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1560518846-cebc533b6271?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
+        <div className="container max-w-3xl relative z-10">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
             Not sure which service fits your situation?
           </h2>
-          <p className="text-lg text-primary-foreground/80 mb-8">
+          <p className="text-lg text-primary-foreground/75 mb-8">
             Book a free 15-minute consultation. We'll review your situation and tell you exactly what you need.
           </p>
-          <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-10 text-base" asChild>
+          <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-10 text-base shadow-lg" asChild>
             <Link href="/book">Book Free Consultation</Link>
           </Button>
+          <p className="text-primary-foreground/50 text-sm mt-4">No pressure. No commitment required.</p>
         </div>
       </section>
     </PublicLayout>
