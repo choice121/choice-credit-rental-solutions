@@ -1,0 +1,43 @@
+name: Architecture Guard
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  architecture-guard:
+    name: Verify Architecture Constraints
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Architecture Guard
+        run: node scripts/check-architecture.mjs
+
+      - name: Block if Replit DB migration files exist
+        run: |
+          if find . -name "*.sql" -path "*/drizzle/*" | grep -q .; then
+            echo "❌ Drizzle migration SQL files detected."
+            echo "   This project uses Supabase, not Drizzle migrations."
+            echo "   See ARCHITECTURE.md for the correct database approach."
+            exit 1
+          fi
+          echo "✅ No Drizzle migration files detected."
+
+      - name: Verify Supabase dependency present
+        run: |
+          if ! grep -q '"@supabase/supabase-js"' artifacts/api-server/package.json; then
+            echo "❌ @supabase/supabase-js has been removed from the API server."
+            echo "   This is a required dependency. See ARCHITECTURE.md."
+            exit 1
+          fi
+          echo "✅ @supabase/supabase-js present in API server."

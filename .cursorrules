@@ -1,0 +1,34 @@
+# Cursor Rules — Choice Credit and Rental Solutions
+
+## Architecture Is Locked
+
+This project uses a fixed production stack. Do not migrate or replace any part of it.
+
+### Stack (non-negotiable)
+- Database: Supabase PostgreSQL
+- Auth: Supabase Auth
+- Storage: Supabase Storage
+- Email: Google Apps Script
+- Deployment: Cloudflare Pages
+- Dev environment: Replit (code editor only — not production)
+
+### Forbidden Actions
+- Do NOT replace Supabase with any other database
+- Do NOT replace Supabase Auth with Replit Auth, Clerk, or anything else
+- Do NOT add @replit/database or @replit/object-storage
+- Do NOT replace Google Apps Script email
+- Do NOT change the deployment target
+
+### Key Files (do not replace these)
+- artifacts/api-server/src/lib/supabase.ts
+- artifacts/api-server/src/lib/auth-middleware.ts
+- artifacts/choice-credit/src/lib/supabase.ts
+- artifacts/choice-credit/src/lib/auth.tsx
+
+### What Is Safe
+- New routes in artifacts/api-server/src/routes/
+- New pages/components in artifacts/choice-credit/src/
+- OpenAPI spec changes in lib/api-spec/openapi.yaml (run codegen after)
+- UI and feature work using existing Supabase tables
+
+See ARCHITECTURE.md for the full specification.
