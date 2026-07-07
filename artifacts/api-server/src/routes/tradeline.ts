@@ -3,9 +3,10 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/estimate", (req, res) => {
-  const currentScore = parseInt(req.query.currentScore as string, 10);
+  // Support both param naming conventions (frontend uses score/age, some callers use currentScore/accountAge)
+  const currentScore = parseInt((req.query.currentScore ?? req.query.score) as string, 10);
   const utilization = parseInt(req.query.utilization as string, 10);
-  const accountAge = parseInt(req.query.accountAge as string, 10);
+  const accountAge = parseInt((req.query.accountAge ?? req.query.age) as string, 10);
   const numTradelines = parseInt((req.query.numTradelines as string) || "1", 10);
 
   if (isNaN(currentScore) || isNaN(utilization) || isNaN(accountAge)) {

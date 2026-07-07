@@ -20,13 +20,8 @@ router.post("/", strictLimiter, async (req, res) => {
     const { email } = parsed.data;
 
     const { error } = await supabase
-      .from("contacts")
-      .insert({
-        full_name: email,
-        email,
-        message: "Newsletter subscription",
-        type: "newsletter",
-      });
+      .from("newsletter_subscribers")
+      .upsert({ email, is_active: true }, { onConflict: "email" });
 
     if (error) {
       console.error("Newsletter insert error:", error);
