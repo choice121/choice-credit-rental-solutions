@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
@@ -203,11 +203,19 @@ export default function Testimonials({ compact = false }: { compact?: boolean })
               {/* Top row */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-full ${t.avatarBg} flex items-center justify-center text-white font-bold text-lg shrink-0`}>
-                    {t.initials}
+                  <div className="relative shrink-0">
+                    <div className={`w-14 h-14 rounded-full ${t.avatarBg} flex items-center justify-center text-white font-bold text-lg`}>
+                      {t.initials}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-primary">
+                      <BadgeCheck className="w-3 h-3 text-white" />
+                    </div>
                   </div>
                   <div>
-                    <p className="font-semibold text-primary-foreground text-lg">{t.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-primary-foreground text-lg">{t.name}</p>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full tracking-wide uppercase">Verified Client</span>
+                    </div>
                     <p className="text-primary-foreground/60 text-sm">{t.location}</p>
                     <StarRating count={t.stars} />
                   </div>

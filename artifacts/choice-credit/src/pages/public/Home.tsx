@@ -3,8 +3,9 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import {
-  ArrowRight, CheckCircle2, Shield, TrendingUp, Home as HomeIcon,
-  Clock, Users, Award, Lock, MapPin
+  ArrowRight, CheckCircle2, Shield, TrendingUp,
+  Clock, Users, Award, Lock, MapPin, ShieldCheck, X, Check,
+  CalendarClock, ClipboardCheck, FileText, Rocket
 } from "lucide-react";
 import RenterChallenges from "@/components/RenterChallenges";
 import Testimonials from "@/components/Testimonials";
@@ -12,6 +13,23 @@ import FAQ from "@/components/FAQ";
 import TrustBadgeBar from "@/components/TrustBadgeBar";
 import BeforeAfter from "@/components/BeforeAfter";
 import ScrollReveal from "@/components/ScrollReveal";
+
+// ── Guarantee Banner ────────────────────────────────────────────────────────
+function GuaranteeBanner() {
+  return (
+    <div className="bg-emerald-600 text-white py-3.5">
+      <div className="container max-w-5xl flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+        <ShieldCheck className="w-5 h-5 shrink-0" />
+        <p className="text-sm font-medium">
+          <span className="font-bold">Our Promise:</span> If we don't produce measurable results within your package timeline, we keep working with you at no extra charge until we do.
+        </p>
+        <Button asChild size="sm" variant="outline" className="border-white/40 text-white hover:bg-white/10 shrink-0 text-xs h-7 px-3">
+          <Link href="/services#guarantee">See Full Guarantee</Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 // ── Animated count-up hook ──────────────────────────────────────────────────
 function useCountUp(target: number, duration = 1800, triggered: boolean) {
@@ -101,66 +119,98 @@ function ProofStrip() {
 
 // ── How It Works ────────────────────────────────────────────────────────────
 function HowItWorks() {
-  const steps = [
+  const timeline = [
     {
-      number: "01",
-      icon: <Clock className="w-7 h-7" />,
-      title: "Free Assessment",
-      description: "We review your credit profile, rental history, and income situation to identify exactly why you were denied and what needs to change.",
-      accent: "text-blue-600",
-      bg: "bg-blue-50",
+      day: "Day 1",
+      icon: <CalendarClock className="w-6 h-6" />,
+      title: "Free Consultation Call",
+      description: "You speak with a real advisor — not a chatbot. We review your credit profile, rental history, income situation, and the exact reason(s) you were denied. No judgment, just a plan.",
+      details: ["Full credit profile review", "Denial reason analysis", "Package recommendation", "Realistic timeline set"],
+      accent: "bg-blue-100 text-blue-600",
+      line: "bg-blue-200",
     },
     {
-      number: "02",
-      icon: <CheckCircle2 className="w-7 h-7" />,
-      title: "Strategic Plan",
-      description: "We build a custom roadmap — credit dispute letters, strategic tradelines, or specialized income documentation, tailored to your exact situation.",
-      accent: "text-accent",
-      bg: "bg-accent/10",
+      day: "Days 2–5",
+      icon: <ClipboardCheck className="w-6 h-6" />,
+      title: "Your Custom Plan is Built",
+      description: "Your advisor builds a strategy tailored to your exact situation — dispute letters, tradeline selection, income documentation formatting, or co-signer coordination. Nothing generic.",
+      details: ["Personalized approval roadmap", "Dispute letters drafted (if needed)", "Tradeline strategy selected", "Document checklist sent to you"],
+      accent: "bg-violet-100 text-violet-600",
+      line: "bg-violet-200",
     },
     {
-      number: "03",
-      icon: <HomeIcon className="w-7 h-7" />,
-      title: "Application & Approval",
-      description: "When ready, we package your application to present you as the ideal tenant — maximizing your chance of a 'Yes' from day one.",
-      accent: "text-emerald-600",
-      bg: "bg-emerald-50",
+      day: "Days 7–30",
+      icon: <FileText className="w-6 h-6" />,
+      title: "Execution & Progress",
+      description: "We work through every step of the plan with you. Tradelines post, disputes resolve, your profile strengthens. You receive updates throughout — no guessing where things stand.",
+      details: ["Tradelines posting to credit", "Dispute responses tracked", "Score monitoring active", "Advisor available for questions"],
+      accent: "bg-emerald-100 text-emerald-600",
+      line: "bg-emerald-200",
+    },
+    {
+      day: "Day 30+",
+      icon: <Rocket className="w-6 h-6" />,
+      title: "Apply with Confidence",
+      description: "When your profile is ready, we package your application to present you as the strongest possible tenant. We coach you on which properties to target, how to answer questions, and what to expect.",
+      details: ["Application package prepared", "Property targeting guidance", "Application submission support", "Keys in hand"],
+      accent: "bg-accent/20 text-accent",
+      line: "bg-accent/30",
     },
   ];
 
   return (
     <section className="py-24 bg-background">
-      <div className="container max-w-5xl">
+      <div className="container max-w-4xl">
         <ScrollReveal>
           <div className="text-center mb-16">
             <span className="inline-block bg-primary/10 text-primary font-semibold text-sm uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
               How It Works
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Three steps from denied to approved
+              Exactly what happens after you book
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A proven framework built for your specific barriers — not a generic credit repair template.
+              No mystery. No waiting to find out what's next. Here's the real day-by-day breakdown of your path from denied to approved.
             </p>
           </div>
         </ScrollReveal>
 
         <div className="relative">
-          <div className="hidden md:block absolute top-10 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-0.5 bg-gradient-to-r from-blue-200 via-accent/40 to-emerald-200" />
-          <div className="grid md:grid-cols-3 gap-8 md:gap-4">
-            {steps.map((step, i) => (
-              <ScrollReveal key={i} delay={i * 140}>
-                <div className="relative flex flex-col items-center text-center group">
-                  <div className="relative mb-6">
-                    <div className={`w-20 h-20 ${step.bg} rounded-full flex items-center justify-center ${step.accent} shadow-sm group-hover:scale-105 transition-transform duration-300 z-10 relative`}>
-                      {step.icon}
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-7 h-7 bg-foreground rounded-full flex items-center justify-center z-20">
-                      <span className="text-background text-[10px] font-black">{step.number}</span>
+          {/* Vertical line */}
+          <div className="absolute left-[1.75rem] md:left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 hidden sm:block" />
+
+          <div className="space-y-10">
+            {timeline.map((step, i) => (
+              <ScrollReveal key={i} delay={i * 120}>
+                <div className={`relative flex gap-6 md:gap-0 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                  {/* Content */}
+                  <div className={`flex-1 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
+                    <div className={`bg-card border rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow ${i % 2 !== 0 ? "" : ""}`}>
+                      <div className={`inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3 ${step.accent}`}>
+                        {step.day}
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">{step.description}</p>
+                      <ul className={`space-y-1.5 ${i % 2 === 0 ? "md:items-end" : ""} flex flex-col`}>
+                        {step.details.map((d, j) => (
+                          <li key={j} className={`flex items-center gap-2 text-xs text-muted-foreground ${i % 2 === 0 ? "md:flex-row-reverse md:self-end" : ""}`}>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            {d}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed text-sm max-w-xs">{step.description}</p>
+
+                  {/* Center dot */}
+                  <div className="hidden sm:flex absolute left-1/2 top-6 -translate-x-1/2 z-10">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 border-background shadow ${step.accent}`}>
+                      {step.icon}
+                    </div>
+                  </div>
+
+                  {/* Spacer for the other side */}
+                  <div className="flex-1 hidden md:block" />
                 </div>
               </ScrollReveal>
             ))}
@@ -168,13 +218,195 @@ function HowItWorks() {
         </div>
 
         <ScrollReveal delay={300}>
-          <div className="text-center mt-12">
+          <div className="text-center mt-14">
+            <p className="text-muted-foreground mb-4 text-sm">Most clients are approved within 14–45 days of starting.</p>
             <Button asChild size="lg" className="h-12 px-8">
               <Link href="/book">
-                Start with a free assessment <ArrowRight className="w-4 h-4 ml-2" />
+                Start with a free consultation <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
           </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
+
+// ── Vs. Alone Comparison ─────────────────────────────────────────────────────
+function VsAlone() {
+  const rows = [
+    { label: "Time to first approval", alone: "6–18 months of trial & error", us: "14–45 days on average" },
+    { label: "Know why you were denied", alone: "Guessing or generic advice", us: "Specific denial analysis on Day 1" },
+    { label: "Dispute letters", alone: "Templates from Google — often wrong", us: "Custom letters written for your case" },
+    { label: "Tradeline strategy", alone: "Unknown — easy to do it wrong", us: "Targeted placement for maximum impact" },
+    { label: "Second-chance landlords", alone: "Hours of research, still incomplete", us: "We know exactly who accepts your profile" },
+    { label: "Application presentation", alone: "Same format that already got you denied", us: "Packaged to lead with your strengths" },
+    { label: "Cost of another denial", alone: "Lost deposit + application fees + time", us: "Avoided — we get it right the first time" },
+    { label: "Support when you're stuck", alone: "None", us: "Direct advisor access throughout" },
+  ];
+
+  return (
+    <section className="py-24 bg-muted/40 border-y">
+      <div className="container max-w-5xl">
+        <ScrollReveal>
+          <div className="text-center mb-14">
+            <span className="inline-block bg-primary/10 text-primary font-semibold text-sm uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+              Why Not DIY?
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Doing it alone vs. doing it right
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Most people try on their own first. Most get denied again. Here's what the difference looks like in practice.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={100}>
+          {/* Desktop table */}
+          <div className="hidden md:block rounded-2xl overflow-hidden border shadow-sm">
+            <div className="grid grid-cols-3 bg-foreground text-background text-sm font-semibold">
+              <div className="px-6 py-4 text-muted-foreground/60">What you need</div>
+              <div className="px-6 py-4 border-l border-background/10 flex items-center gap-2">
+                <X className="w-4 h-4 text-rose-400" /> On your own
+              </div>
+              <div className="px-6 py-4 border-l border-background/10 flex items-center gap-2 bg-accent/20">
+                <Check className="w-4 h-4 text-emerald-400" /> With Choice Credit
+              </div>
+            </div>
+            {rows.map((row, i) => (
+              <div key={i} className={`grid grid-cols-3 border-t text-sm ${i % 2 === 0 ? "bg-card" : "bg-muted/30"}`}>
+                <div className="px-6 py-4 font-medium text-foreground">{row.label}</div>
+                <div className="px-6 py-4 border-l text-muted-foreground">{row.alone}</div>
+                <div className="px-6 py-4 border-l text-foreground font-medium bg-emerald-50/50">{row.us}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile stacked cards */}
+          <div className="md:hidden space-y-3">
+            {rows.map((row, i) => (
+              <div key={i} className="rounded-xl border bg-card p-4 shadow-sm">
+                <p className="font-semibold text-foreground text-sm mb-3">{row.label}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-rose-50 rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <X className="w-3 h-3 text-rose-400" />
+                      <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wide">On your own</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{row.alone}</p>
+                  </div>
+                  <div className="bg-emerald-50 rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Check className="w-3 h-3 text-emerald-500" />
+                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">With us</span>
+                    </div>
+                    <p className="text-xs text-foreground font-medium leading-relaxed">{row.us}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={200}>
+          <div className="mt-10 bg-primary rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="font-serif text-xl md:text-2xl font-bold text-primary-foreground mb-1">
+                Our fee pays for itself the first time you avoid a denial.
+              </p>
+              <p className="text-primary-foreground/70 text-sm">
+                One failed application typically costs $50–$200 in fees alone — before counting lost time and deposit.
+              </p>
+            </div>
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0 h-12 px-8">
+              <Link href="/book">Get Started for Free</Link>
+            </Button>
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
+
+// ── Soft Quiz CTA ────────────────────────────────────────────────────────────
+function FindYourPath() {
+  const paths = [
+    {
+      emoji: "🏠",
+      label: "I need an apartment fast",
+      desc: "Move-in ready within 2 weeks",
+      href: "/book?challenge=urgent&service=instant-approval",
+      color: "hover:border-violet-400 hover:bg-violet-50/50",
+    },
+    {
+      emoji: "📈",
+      label: "I want to rebuild my credit",
+      desc: "Score improvement + approval plan",
+      href: "/book?challenge=bad-credit&service=guided-approval",
+      color: "hover:border-blue-400 hover:bg-blue-50/50",
+    },
+    {
+      emoji: "📋",
+      label: "I have an eviction on my record",
+      desc: "Second-chance housing strategy",
+      href: "/book?challenge=eviction&service=full-service-approval",
+      color: "hover:border-amber-400 hover:bg-amber-50/50",
+    },
+    {
+      emoji: "💼",
+      label: "I'm self-employed or freelance",
+      desc: "Income documentation that landlords accept",
+      href: "/book?challenge=income-verification&service=guided-approval",
+      color: "hover:border-emerald-400 hover:bg-emerald-50/50",
+    },
+    {
+      emoji: "🤷",
+      label: "I'm not sure what I need",
+      desc: "Tell us your situation — we'll figure it out",
+      href: "/book",
+      color: "hover:border-primary/40 hover:bg-primary/5",
+    },
+  ];
+
+  return (
+    <section className="py-24 bg-background">
+      <div className="container max-w-3xl">
+        <ScrollReveal>
+          <div className="text-center mb-10">
+            <span className="inline-block bg-accent/10 text-accent font-semibold text-sm uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+              Find Your Path
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Which one sounds like you?
+            </h2>
+            <p className="text-muted-foreground">
+              Pick your situation and we'll pre-fill your consultation with the right context.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        <div className="space-y-3">
+          {paths.map((p, i) => (
+            <ScrollReveal key={i} delay={i * 70}>
+              <Link href={p.href}>
+                <div className={`flex items-center gap-5 p-5 rounded-2xl border border-border cursor-pointer transition-all duration-200 ${p.color} group`}>
+                  <span className="text-3xl shrink-0">{p.emoji}</span>
+                  <div className="flex-1">
+                    <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{p.label}</p>
+                    <p className="text-sm text-muted-foreground">{p.desc}</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+                </div>
+              </Link>
+            </ScrollReveal>
+          ))}
+        </div>
+
+        <ScrollReveal delay={400}>
+          <p className="text-center text-xs text-muted-foreground mt-6">
+            Free consultation · No commitment · We respond within 3 hours
+          </p>
         </ScrollReveal>
       </div>
     </section>
@@ -299,13 +531,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust badge bar — immediately below hero */}
+      {/* Guarantee banner — immediately below hero */}
+      <GuaranteeBanner />
+
+      {/* Trust badge bar */}
       <TrustBadgeBar />
 
       {/* Animated stats */}
       <AnimatedStats />
 
-      {/* How It Works */}
+      {/* How It Works — detailed day-by-day timeline */}
       <HowItWorks />
 
       {/* Renter Challenges */}
@@ -317,8 +552,14 @@ export default function Home() {
       {/* Before/After transformations */}
       <BeforeAfter />
 
+      {/* Doing it alone vs. with us */}
+      <VsAlone />
+
       {/* Why Choose Us */}
       <WhyChooseUs />
+
+      {/* Find Your Path — soft quiz CTA */}
+      <FindYourPath />
 
       {/* FAQ */}
       <FAQ />

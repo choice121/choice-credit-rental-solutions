@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import {
   Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home,
-  ArrowRight, Star, FileSearch, AlertCircle, CheckCircle2
+  ArrowRight, Star, FileSearch, AlertCircle, CheckCircle2, ShieldCheck, X
 } from "lucide-react";
 import { Link } from "wouter";
 import Testimonials from "@/components/Testimonials";
+import ScrollReveal from "@/components/ScrollReveal";
 
 const STATIC_PACKAGES = [
   {
@@ -184,6 +185,174 @@ const ADDONS = [
     href: "/book?service=tradeline",
   },
 ];
+
+// ── Guarantee Section ────────────────────────────────────────────────────────
+function GuaranteeSection() {
+  const points = [
+    "We work with you beyond your package timeline — at no extra charge — if approval isn't achieved",
+    "Every strategy we use is legal, ethical, and grounded in the Fair Credit Reporting Act",
+    "You'll know exactly what we're doing and why at every step — no black boxes",
+    "If we determine during the free consultation that we can't help you, we'll tell you honestly",
+  ];
+
+  return (
+    <section id="guarantee" className="py-20 bg-emerald-600 text-white">
+      <div className="container max-w-5xl">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <ScrollReveal direction="left">
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-bold uppercase tracking-widest text-white/70">Our Promise</span>
+              </div>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mb-5 leading-tight">
+                We don't stop until you're approved.
+              </h2>
+              <p className="text-white/80 text-lg leading-relaxed mb-6">
+                If we don't produce measurable results within your package timeline, we keep working with you at no extra charge. No fine print. No runaround. No landlord can be legally guaranteed — but our commitment to your case absolutely can.
+              </p>
+              <Button asChild size="lg" className="bg-white text-emerald-700 hover:bg-white/90 h-12 px-8 font-semibold">
+                <Link href="/book">Claim Your Free Consultation</Link>
+              </Button>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal direction="right">
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-7 space-y-4">
+              <p className="font-semibold text-white text-sm uppercase tracking-wider mb-5">What our guarantee means in practice:</p>
+              {points.map((point, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <p className="text-white/85 text-sm leading-relaxed">{point}</p>
+                </div>
+              ))}
+              <div className="pt-4 border-t border-white/20 mt-4">
+                <p className="text-white/60 text-xs italic">
+                  Our 98% approval rate exists because we stay committed — not because we cherry-pick easy cases. We specialize in the hard ones.
+                </p>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Package Comparison Table ─────────────────────────────────────────────────
+function PackageComparison() {
+  const features = [
+    { label: "Full credit profile review", tiers: [true, true, true] },
+    { label: "Written action plan & roadmap", tiers: [true, true, true] },
+    { label: "One advisor check-in call", tiers: [true, true, true] },
+    { label: "Custom dispute letters", tiers: [false, true, true] },
+    { label: "Authorized tradeline placement", tiers: [false, "1 tradeline", "2 tradelines"] },
+    { label: "Rental application review", tiers: [false, true, true] },
+    { label: "Unlimited advisor messaging", tiers: [false, true, true] },
+    { label: "Document checklist & tracking", tiers: [false, true, true] },
+    { label: "Income documentation strategy", tiers: [false, false, true] },
+    { label: "Priority advisor access", tiers: [false, false, true] },
+    { label: "Application submission support", tiers: [false, false, true] },
+    { label: "Lease review & guidance", tiers: [false, false, true] },
+  ];
+
+  const tiers = [
+    { name: "Readiness Report", price: "$149", highlight: false },
+    { name: "Guided Approval", price: "$349", highlight: true },
+    { name: "Full-Service", price: "$649", highlight: false },
+  ];
+
+  function Cell({ value }: { value: boolean | string }) {
+    if (value === true) return <Check className="w-5 h-5 text-emerald-500 mx-auto" />;
+    if (value === false) return <X className="w-4 h-4 text-muted-foreground/30 mx-auto" />;
+    return <span className="text-xs font-semibold text-primary">{value}</span>;
+  }
+
+  return (
+    <section className="py-16 bg-muted/30 border-y">
+      <div className="container max-w-4xl">
+        <ScrollReveal>
+          <div className="text-center mb-10">
+            <h3 className="font-serif text-2xl font-bold text-foreground mb-2">Compare packages side by side</h3>
+            <p className="text-muted-foreground text-sm">See exactly what's included in each tier before you decide.</p>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={100}>
+          {/* Desktop table */}
+          <div className="hidden md:block rounded-2xl overflow-hidden border bg-card shadow-sm">
+            <div className="grid grid-cols-4 border-b">
+              <div className="p-5 text-sm font-semibold text-muted-foreground">Feature</div>
+              {tiers.map((tier, i) => (
+                <div key={i} className={`p-5 text-center border-l ${tier.highlight ? "bg-primary text-primary-foreground" : ""}`}>
+                  <p className="font-bold text-sm">{tier.name}</p>
+                  <p className={`text-xl font-bold mt-1 ${tier.highlight ? "text-primary-foreground" : "text-foreground"}`}>{tier.price}</p>
+                </div>
+              ))}
+            </div>
+            {features.map((row, i) => (
+              <div key={i} className={`grid grid-cols-4 border-t ${i % 2 === 0 ? "" : "bg-muted/20"}`}>
+                <div className="p-4 text-sm text-foreground/80 flex items-center">{row.label}</div>
+                {row.tiers.map((val, j) => (
+                  <div key={j} className={`p-4 border-l flex items-center justify-center ${tiers[j].highlight ? "bg-primary/5" : ""}`}>
+                    <Cell value={val} />
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div className="grid grid-cols-4 border-t bg-muted/30">
+              <div className="p-4" />
+              {tiers.map((tier, i) => (
+                <div key={i} className={`p-4 border-l ${tier.highlight ? "bg-primary/5" : ""}`}>
+                  <Button asChild size="sm" className="w-full" variant={tier.highlight ? "default" : "outline"}>
+                    <Link href={`/book?service=${["readiness-report","guided-approval","full-service-approval"][i]}`}>
+                      Choose {tier.name.split(" ")[0]}
+                    </Link>
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile — stacked tier cards */}
+          <div className="md:hidden space-y-4">
+            {tiers.map((tier, ti) => (
+              <div key={ti} className={`rounded-2xl border overflow-hidden shadow-sm ${tier.highlight ? "border-primary border-2" : ""}`}>
+                <div className={`px-5 py-4 ${tier.highlight ? "bg-primary text-primary-foreground" : "bg-muted/40"}`}>
+                  <p className="font-bold">{tier.name}</p>
+                  <p className={`text-2xl font-bold ${tier.highlight ? "text-primary-foreground" : "text-foreground"}`}>{tier.price}</p>
+                </div>
+                <div className="divide-y">
+                  {features.map((row, fi) => {
+                    const val = row.tiers[ti];
+                    if (val === false) return null;
+                    return (
+                      <div key={fi} className="flex items-center gap-3 px-5 py-3">
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span className="text-sm text-foreground/80">{typeof val === "string" ? `${row.label} (${val})` : row.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="p-4 border-t">
+                  <Button asChild size="sm" className="w-full" variant={tier.highlight ? "default" : "outline"}>
+                    <Link href={`/book?service=${["readiness-report","guided-approval","full-service-approval"][ti]}`}>
+                      Choose {tier.name}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
 
 // Mini testimonial strip for social proof at the top of services
 const MINI_TESTIMONIALS = [
@@ -457,6 +626,9 @@ export default function Services() {
         </div>
       </section>
 
+      {/* Package comparison table */}
+      <PackageComparison />
+
       {/* Full Testimonials carousel after consulting packages */}
       <Testimonials />
 
@@ -621,6 +793,9 @@ export default function Services() {
           </div>
         </div>
       </section>
+
+      {/* Guarantee section */}
+      <GuaranteeSection />
 
       {/* Serious Clients Only */}
       <SeriousClientsOnly />
