@@ -37,6 +37,7 @@ const AdminLeads = lazy(() => import("@/pages/admin/Leads"));
 const AdminMessages = lazy(() => import("@/pages/admin/Messages"));
 const AdminRevenue = lazy(() => import("@/pages/admin/Revenue"));
 const AdminImageGenerator = lazy(() => import("@/image-generator/ImageGeneratorPage"));
+const AdminDocumentGenerator = lazy(() => import("@/doc-generator/DocumentGeneratorPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,6 +107,7 @@ function Router() {
         <Route path="/admin/messages">{() => <ProtectedRoute component={AdminMessages} adminOnly />}</Route>
         <Route path="/admin/revenue">{() => <ProtectedRoute component={AdminRevenue} adminOnly />}</Route>
         <Route path="/admin/image-generator">{() => <ProtectedRoute component={AdminImageGenerator} adminOnly />}</Route>
+        <Route path="/admin/documents">{() => <ProtectedRoute component={AdminDocumentGenerator} adminOnly />}</Route>
 
         <Route component={NotFound} />
       </Switch>
