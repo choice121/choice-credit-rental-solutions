@@ -1,0 +1,1 @@
+- [Doc Generator Feature](doc-generator.md) — PDF document generation for Choice Credit; 13 templates, 2 DB tables, RLS split by operation.
