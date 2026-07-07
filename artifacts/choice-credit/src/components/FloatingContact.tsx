@@ -11,11 +11,11 @@ export default function FloatingContact() {
       {open && (
         <div className="flex flex-col gap-2 items-end animate-in slide-in-from-bottom-4 duration-200">
           <a
-            href="sms:7070631370"
+            href="sms:7077063137"
             className="flex items-center gap-3 bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
           >
             <MessageCircle className="w-4 h-4" />
-            Text us · (707) 063-1370
+            Text us · (707) 706-3137
           </a>
           <Link
             href="/contact"

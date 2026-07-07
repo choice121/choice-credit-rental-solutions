@@ -14,7 +14,7 @@ const NEXT_STEPS = [
     icon: <Phone className="h-5 w-5" />,
     color: "bg-emerald-100 text-emerald-600",
     title: "We'll text within 24 hours",
-    desc: "An advisor will text you at (707) 063-1370 — save the number. They'll reach out at your preferred contact time to discuss your situation and next steps.",
+    desc: "An advisor will text you at (707) 706-3137 — save the number. They'll reach out at your preferred contact time to discuss your situation and next steps.",
   },
   {
     icon: <CheckCircle2 className="h-5 w-5" />,
@@ -146,10 +146,10 @@ export default function BookConfirmation() {
             </Button>
           </div>
           <a
-            href="sms:7070631370"
+            href="sms:7077063137"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
-            <Phone className="w-4 h-4" /> Text (707) 063-1370 · Mon–Sat 9AM–7PM EST
+            <Phone className="w-4 h-4" /> Text (707) 706-3137 · Mon–Sat 9AM–7PM EST
           </a>
         </div>
       </section>

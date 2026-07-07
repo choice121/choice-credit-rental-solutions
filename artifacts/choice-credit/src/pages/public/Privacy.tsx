@@ -46,7 +46,7 @@ We do not sell, rent, or trade your personal information to third parties for ma
   },
   {
     title: "Contact Us",
-    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 063-1370 (text only)`,
+    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 706-3137 (text only)`,
   },
 ];
 

@@ -70,11 +70,11 @@ export default function Contact() {
       <div className="bg-card border-b py-5">
         <div className="container max-w-5xl">
           <div className="flex flex-wrap justify-center gap-6">
-            <a href="sms:7070631370" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+            <a href="sms:7077063137" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <Phone className="w-4 h-4 text-primary" />
               </div>
-              (707) 063-1370 · Text only
+              (707) 706-3137 · Text only
             </a>
             <a href="mailto:choicecreditandrentalsolutions@gmail.com" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -111,8 +111,8 @@ export default function Contact() {
                   icon: <Phone className="w-5 h-5 text-primary" />,
                   title: "Text (no calls)",
                   sub: "Mon–Sat from 9AM to 7PM EST",
-                  value: "(707) 063-1370",
-                  href: "sms:7070631370",
+                  value: "(707) 706-3137",
+                  href: "sms:7077063137",
                 },
                 {
                   icon: <Mail className="w-5 h-5 text-primary" />,
@@ -125,8 +125,8 @@ export default function Contact() {
                   icon: <MessageCircle className="w-5 h-5 text-primary" />,
                   title: "Text / SMS",
                   sub: "Fastest way to reach us",
-                  value: "Text (707) 063-1370",
-                  href: "sms:7070631370",
+                  value: "Text (707) 706-3137",
+                  href: "sms:7077063137",
                 },
                 {
                   icon: <MapPin className="w-5 h-5 text-primary" />,

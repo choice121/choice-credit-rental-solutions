@@ -60,7 +60,7 @@ Our total liability for any claim arising from our services shall not exceed the
   },
   {
     title: "Contact",
-    content: `If you have questions about these Terms of Service, please contact:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 063-1370 (text only)`,
+    content: `If you have questions about these Terms of Service, please contact:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 706-3137 (text only)`,
   },
 ];
 

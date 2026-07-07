@@ -173,11 +173,11 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           {/* Desktop right actions */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
             <a
-              href="sms:7070631370"
+              href="sms:7077063137"
               className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               <Phone className="w-3.5 h-3.5" />
-              (707) 063-1370
+              (707) 706-3137
             </a>
 
             {user ? (
@@ -206,7 +206,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           {/* Mobile right actions */}
           <div className="flex lg:hidden items-center gap-1">
             <a
-              href="sms:7070631370"
+              href="sms:7077063137"
               aria-label="Text us"
               className="w-9 h-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
@@ -291,11 +291,11 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                     <Link href="/book">Book Free Consultation</Link>
                   </Button>
                   <a
-                    href="sms:7070631370"
+                    href="sms:7077063137"
                     className="flex items-center justify-center gap-2 h-11 rounded-lg border border-border bg-muted/40 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                   >
                     <Phone className="w-4 h-4" />
-                    Text (707) 063-1370
+                    Text (707) 706-3137
                   </a>
                 </div>
 
@@ -402,7 +402,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <ul className="space-y-3 text-sm text-sidebar-foreground/65 mb-6">
               <li className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 shrink-0" />
-                <a href="sms:7070631370" className="hover:text-sidebar-foreground transition-colors">(707) 063-1370 (text)</a>
+                <a href="sms:7077063137" className="hover:text-sidebar-foreground transition-colors">(707) 706-3137 (text)</a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 shrink-0" />
@@ -450,7 +450,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <Link href="/book">Book Free Consultation</Link>
         </Button>
         <a
-          href="sms:7070631370"
+          href="sms:7077063137"
           className="flex items-center justify-center gap-1.5 px-4 h-11 rounded-md border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors shrink-0"
         >
           <Phone className="w-4 h-4" />
