@@ -41,10 +41,8 @@ const BUREAU_ADDRESSES: Record<string, string> = {
 
 export interface CreditDisputeLetterProps {
   clientName: string;
-  clientAddress: string;
-  clientCity: string;
-  clientState: string;
-  clientZip?: string;
+  /** Full mailing address — e.g. "123 Main St, Atlanta, GA 30301" */
+  clientFullAddress: string;
   bureau: "Equifax" | "Experian" | "TransUnion";
   accountName: string;
   accountNumber?: string;
@@ -55,10 +53,7 @@ export interface CreditDisputeLetterProps {
 
 export function CreditDisputeLetterPDF({
   clientName,
-  clientAddress,
-  clientCity,
-  clientState,
-  clientZip,
+  clientFullAddress,
   bureau,
   accountName,
   accountNumber,
@@ -81,8 +76,9 @@ export function CreditDisputeLetterPDF({
         {/* Sender */}
         <View style={s.section}>
           <Text style={s.bold}>{clientName}</Text>
-          <Text style={s.body}>{clientAddress}</Text>
-          <Text style={s.body}>{clientCity}, {clientState}{clientZip ? ` ${clientZip}` : ""}</Text>
+          {clientFullAddress.split(",").map((line, i) => (
+            <Text key={i} style={s.body}>{line.trim()}</Text>
+          ))}
         </View>
 
         {/* Recipient */}

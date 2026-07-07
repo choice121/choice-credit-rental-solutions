@@ -74,6 +74,7 @@ export async function saveGeneratedDocument(doc: {
   document_type: string;
   document_name: string;
   data_snapshot?: Record<string, unknown>;
+  file_url?: string;
   created_by?: string;
 }): Promise<GeneratedDocument> {
   const supabase = getAdminClient();

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, pdf as pdfRenderer } from "@react-pdf/renderer";
 import type { DocumentProps } from "@react-pdf/renderer";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { useListAdminClients } from "@workspace/api-client-react";
 import type { AdminClient } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import {
   Search, Download, FileText, ChevronRight, User,
   Settings, BookOpen, Home,
@@ -68,11 +69,12 @@ export default function DocumentGeneratorPage() {
       .finally(() => setHistoryLoading(false));
   }, [selectedClient?.id]);
 
-  // Pre-fill form when doc type or client changes
+  // Pre-fill form when doc type or client changes — also runs when history finishes loading
+  // so eviction-based prefills (e.g. eviction explanation) have real data to use
   useEffect(() => {
-    if (!selectedClient || !selectedDocType) return;
+    if (!selectedClient || !selectedDocType || historyLoading) return;
     setFormData(getDefaultFormData(selectedDocType, selectedClient, rentalHistory));
-  }, [selectedDocType, selectedClient?.id]);
+  }, [selectedDocType, selectedClient?.id, historyLoading]);
 
   const handleSelectClient = useCallback((client: AdminClient) => {
     setSelectedClient(client);
@@ -85,18 +87,47 @@ export default function DocumentGeneratorPage() {
   };
 
   const handleSaveToProfile = async () => {
-    if (!selectedClient || !selectedDocType) return;
+    if (!selectedClient || !selectedDocType || !pdfDocument) return;
     setSaving(true);
     const template = DOCUMENT_TEMPLATES.find((t) => t.id === selectedDocType);
     try {
+      // 1. Generate PDF blob
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const blob = await pdfRenderer(pdfDocument as any).toBlob();
+
+      // 2. Upload to Supabase Storage (documents bucket)
+      let fileUrl: string | undefined;
+      if (supabase) {
+        const storePath = `generated/${selectedClient.id}/${Date.now()}-${fileName}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("documents")
+          .upload(storePath, blob, { contentType: "application/pdf", upsert: false });
+        if (!uploadError && uploadData) {
+          const { data: { publicUrl } } = supabase.storage
+            .from("documents")
+            .getPublicUrl(uploadData.path);
+          fileUrl = publicUrl;
+        } else if (uploadError) {
+          console.warn("PDF upload to storage failed:", uploadError.message);
+        }
+      }
+
+      // 3. Save metadata record (with file_url if upload succeeded)
       await saveGeneratedDocument({
         client_id: selectedClient.id,
         document_type: selectedDocType,
         document_name: template?.name ?? selectedDocType,
         data_snapshot: { formData, advisorInfo } as Record<string, unknown>,
+        file_url: fileUrl,
         created_by: user?.id,
       });
-      toast({ title: "Saved to client profile", description: `${template?.name} has been saved to ${selectedClient.fullName}'s documents.` });
+
+      toast({
+        title: "Saved to client profile",
+        description: fileUrl
+          ? `${template?.name} is now available for download in the client's Documents tab.`
+          : `${template?.name} has been recorded in ${selectedClient.fullName}'s profile.`,
+      });
     } catch (err: unknown) {
       toast({ title: "Save failed", description: err instanceof Error ? err.message : "Unknown error", variant: "destructive" });
     } finally {

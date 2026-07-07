@@ -84,7 +84,7 @@ export const DOC_FIELDS: Record<DocumentTypeId, DocField[]> = {
     { key: "currentStatus", label: "Current Status", type: "text", placeholder: "e.g. Charges expunged, probation completed, steadily employed" },
   ],
   credit_dispute_letter: [
-    { key: "clientAddress", label: "Client's Mailing Address", type: "text", required: true, placeholder: "123 Main St, Atlanta, GA 30301" },
+    { key: "clientFullAddress", label: "Client's Full Mailing Address", type: "text", required: true, placeholder: "123 Main St, Atlanta, GA 30301" },
     {
       key: "bureau", label: "Credit Bureau", type: "select", required: true,
       options: [
@@ -291,8 +291,7 @@ export function getDocumentComponent(
     case "credit_dispute_letter":
       return createElement(CreditDisputeLetterPDF, {
         clientName: cn, generationDate: date,
-        clientAddress: form.clientAddress || "",
-        clientCity: "", clientState: "",
+        clientFullAddress: form.clientFullAddress || form.clientAddress || "",
         bureau: (form.bureau as "Equifax" | "Experian" | "TransUnion") || "Equifax",
         accountName: form.accountName || "",
         accountNumber: form.accountNumber || undefined,

@@ -156,7 +156,7 @@ export function IncomeVerificationPDF({
   generationDate,
 }: IncomeVerificationProps) {
   const ratio = monthlyRent > 0 ? (monthlyIncome / monthlyRent).toFixed(1) : "—";
-  const meetsThreshold = monthlyIncome >= monthlyRent * 2.5;
+  const meetsThreshold = monthlyIncome >= monthlyRent * 3;
 
   return (
     <Document title={`Income Verification — ${clientName}`}>
