@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 const TEAM = [
   {
     initials: "RW",
+    photo: "https://images.pexels.com/photos/6150694/pexels-photo-6150694.jpeg?auto=compress&cs=tinysrgb&w=600&h=700&fit=crop",
     name: "Raymond Williams",
     title: "Founder & Lead Advisor",
     bg: "bg-primary",
@@ -15,6 +16,7 @@ const TEAM = [
   },
   {
     initials: "MJ",
+    photo: "https://images.pexels.com/photos/7145022/pexels-photo-7145022.jpeg?auto=compress&cs=tinysrgb&w=600&h=700&fit=crop",
     name: "Michelle Johnson",
     title: "Senior Credit Strategist",
     bg: "bg-violet-700",
@@ -23,6 +25,7 @@ const TEAM = [
   },
   {
     initials: "DT",
+    photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=600&h=700",
     name: "David Torres",
     title: "Income Documentation Specialist",
     bg: "bg-emerald-700",
@@ -89,8 +92,8 @@ export default function About() {
               <div className="relative">
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800"
-                    alt="Choice Credit founder"
+                    src="https://images.pexels.com/photos/6150694/pexels-photo-6150694.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Raymond Williams, Choice Credit founder"
                     className="object-cover w-full h-full"
                   />
                 </div>
@@ -183,10 +186,12 @@ export default function About() {
             {TEAM.map((member, i) => (
               <ScrollReveal key={i} delay={i * 120}>
                 <div className="bg-card border rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
-                  <div className={`${member.bg} py-10 flex items-center justify-center`}>
-                    <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-white text-3xl font-bold font-serif">
-                      {member.initials}
-                    </div>
+                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-xl text-foreground">{member.name}</h3>

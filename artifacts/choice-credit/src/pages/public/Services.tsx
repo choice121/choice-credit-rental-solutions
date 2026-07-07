@@ -356,9 +356,9 @@ function PackageComparison() {
 
 // Mini testimonial strip for social proof at the top of services
 const MINI_TESTIMONIALS = [
-  { initials: "MT", bg: "bg-blue-600", quote: "Approved in 22 days — 524 score to Midtown 2BR", challenge: "Bad Credit" },
-  { initials: "DR", bg: "bg-violet-600", quote: "Eviction on file. Still got approved in 17 days.", challenge: "Eviction" },
-  { initials: "JK", bg: "bg-emerald-600", quote: "Freelancers with no pay stubs — townhome approved!", challenge: "Income" },
+  { initials: "MT", photo: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-blue-600", quote: "Approved in 22 days — 524 score to Midtown 2BR", challenge: "Bad Credit" },
+  { initials: "DR", photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-violet-600", quote: "Eviction on file. Still got approved in 17 days.", challenge: "Eviction" },
+  { initials: "JK", photo: "https://images.unsplash.com/photo-1516914943479-89db7d9ae7f2?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-emerald-600", quote: "Freelancers with no pay stubs — townhome approved!", challenge: "Income" },
 ];
 
 // Who we work with section
@@ -552,8 +552,10 @@ export default function Services() {
           <div className="grid sm:grid-cols-3 gap-4">
             {MINI_TESTIMONIALS.map((t, i) => (
               <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-muted/50">
-                <div className={`w-9 h-9 rounded-full ${t.bg} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                  {t.initials}
+                <div className={`w-9 h-9 rounded-full ${t.bg} flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden`}>
+                  {t.photo
+                    ? <img src={t.photo} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+                    : t.initials}
                 </div>
                 <div>
                   <div className="flex gap-0.5 mb-1">

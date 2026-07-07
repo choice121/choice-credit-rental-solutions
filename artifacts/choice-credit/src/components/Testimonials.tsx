@@ -14,6 +14,7 @@ interface Testimonial {
   quote: string;
   initials: string;
   avatarBg: string;
+  photo?: string;
 }
 
 const TESTIMONIALS: Testimonial[] = [
@@ -28,6 +29,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I had a 524 credit score and two collections accounts. Three different apartments turned me down before I found Choice Credit. Within 22 days of working with them, I was approved for a 2-bedroom in Midtown. I honestly didn't think it was possible.",
     initials: "MT",
     avatarBg: "bg-blue-600",
+    photo: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&q=80&w=200&h=200",
   },
   {
     name: "Destiny R.",
@@ -40,6 +42,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I had an eviction from 2021 that kept showing up on every background check. My advisor knew exactly how to handle it. They drafted a dispute letter, helped me find second-chance landlords, and I was in my new place in under 3 weeks. Worth every penny.",
     initials: "DR",
     avatarBg: "bg-violet-600",
+    photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200&h=200",
   },
   {
     name: "James & Sofia K.",
@@ -52,6 +55,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "Both of us are freelancers. We make great money but no landlord would accept our bank statements as proof. Choice Credit formatted our income documentation the right way — we got approved for a townhome with a pool. Incredible service.",
     initials: "JK",
     avatarBg: "bg-emerald-600",
+    photo: "https://images.unsplash.com/photo-1516914943479-89db7d9ae7f2?auto=format&fit=crop&q=80&w=200&h=200",
   },
   {
     name: "Aaliyah M.",
@@ -64,6 +68,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I needed to move quickly after leaving a difficult situation. My credit was a mess and I had no time. The expedited package got my profile into the 720-range and I was in a safe apartment in under 3 weeks. I can't thank this team enough.",
     initials: "AM",
     avatarBg: "bg-pink-600",
+    photo: "https://images.pexels.com/photos/7552075/pexels-photo-7552075.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
   },
   {
     name: "Darnell W.",
@@ -76,6 +81,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I broke my lease due to job loss and had a $3,200 balance in collections. No one would rent to me. The co-signer program was exactly what I needed. The process was smooth and completely professional. I'm in my new apartment and rebuilding my life.",
     initials: "DW",
     avatarBg: "bg-indigo-600",
+    photo: "https://images.pexels.com/photos/7061992/pexels-photo-7061992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
   },
   {
     name: "Priya N.",
@@ -88,6 +94,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I moved from overseas and had zero rental history in the US. Every application was rejected immediately. Choice Credit built a rental readiness profile that actually made sense to American landlords. I got approved for my first US apartment in 2 weeks.",
     initials: "PN",
     avatarBg: "bg-orange-600",
+    photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200",
   },
   {
     name: "Terrence & Maya B.",
@@ -100,6 +107,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "My wife and I were denied for 4 apartments in a row. Our advisor at Choice Credit reviewed our entire profile, disputed 3 incorrect items, added tradelines, and packaged our application beautifully. We're now in a gorgeous place near the beach.",
     initials: "TB",
     avatarBg: "bg-teal-600",
+    photo: "https://images.unsplash.com/photo-1522529599102-193144843773?auto=format&fit=crop&q=80&w=200&h=200",
   },
   {
     name: "Rashida J.",
@@ -112,6 +120,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "I was completely out of options and needed housing fast. The Instant Approval service was a lifesaver — no screening, no rejection risk. The team was professional and kept me updated every step of the way. My kids and I are safe and settled.",
     initials: "RJ",
     avatarBg: "bg-rose-600",
+    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200",
   },
 ];
 
@@ -165,8 +174,10 @@ export default function Testimonials({ compact = false }: { compact?: boolean })
           "{pick.quote.slice(0, 180)}…"
         </p>
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full ${pick.avatarBg} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-            {pick.initials}
+          <div className={`w-9 h-9 rounded-full ${pick.avatarBg} flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden`}>
+            {pick.photo
+              ? <img src={pick.photo} alt={`${pick.name} profile photo`} className="w-full h-full object-cover" />
+              : pick.initials}
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">{pick.name}</p>
@@ -204,8 +215,10 @@ export default function Testimonials({ compact = false }: { compact?: boolean })
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                   <div className="relative shrink-0">
-                    <div className={`w-14 h-14 rounded-full ${t.avatarBg} flex items-center justify-center text-white font-bold text-lg`}>
-                      {t.initials}
+                    <div className={`w-14 h-14 rounded-full ${t.avatarBg} flex items-center justify-center text-white font-bold text-lg overflow-hidden`}>
+                      {t.photo
+                        ? <img src={t.photo} alt={`${t.name} profile photo`} className="w-full h-full object-cover" />
+                        : t.initials}
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-primary">
                       <BadgeCheck className="w-3 h-3 text-white" />
@@ -295,8 +308,10 @@ export default function Testimonials({ compact = false }: { compact?: boolean })
                   : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"
               }`}
             >
-              <span className={`w-4 h-4 rounded-full ${tm.avatarBg} flex items-center justify-center text-white text-[8px] font-bold`}>
-                {tm.initials[0]}
+              <span className={`w-4 h-4 rounded-full ${tm.avatarBg} flex items-center justify-center text-white text-[8px] font-bold overflow-hidden`}>
+                {tm.photo
+                  ? <img src={tm.photo} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+                  : tm.initials[0]}
               </span>
               {tm.name}
             </button>

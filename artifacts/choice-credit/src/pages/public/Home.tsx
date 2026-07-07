@@ -97,16 +97,21 @@ function AnimatedStats() {
 }
 
 // ── Avatar proof strip ──────────────────────────────────────────────────────
-const AVATAR_COLORS = ["bg-violet-600", "bg-emerald-600", "bg-rose-600", "bg-blue-600", "bg-amber-600"];
-const AVATAR_INITIALS = ["MT", "DR", "JK", "AM", "DW"];
+const PROOF_AVATARS = [
+  { photo: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-blue-600" },
+  { photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-violet-600" },
+  { photo: "https://images.unsplash.com/photo-1516914943479-89db7d9ae7f2?auto=format&fit=crop&q=80&w=80&h=80", bg: "bg-emerald-600" },
+  { photo: "https://images.pexels.com/photos/7552075/pexels-photo-7552075.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop", bg: "bg-pink-600" },
+  { photo: "https://images.pexels.com/photos/7061992/pexels-photo-7061992.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop", bg: "bg-indigo-600" },
+];
 
 function ProofStrip() {
   return (
     <div className="flex items-center justify-center gap-3 mt-8">
       <div className="flex -space-x-2">
-        {AVATAR_INITIALS.map((init, i) => (
-          <div key={i} className={`w-8 h-8 rounded-full ${AVATAR_COLORS[i]} border-2 border-primary flex items-center justify-center text-white text-[10px] font-bold`}>
-            {init}
+        {PROOF_AVATARS.map((a, i) => (
+          <div key={i} className={`w-8 h-8 rounded-full ${a.bg} border-2 border-primary overflow-hidden`}>
+            <img src={a.photo} alt="" aria-hidden="true" className="w-full h-full object-cover" />
           </div>
         ))}
       </div>
