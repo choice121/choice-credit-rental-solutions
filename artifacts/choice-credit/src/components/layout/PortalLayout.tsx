@@ -1,18 +1,25 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Building2, LayoutDashboard, FileText, CheckSquare, MessageSquare, CreditCard, Settings, LogOut } from "lucide-react";
+import { Building2, LayoutDashboard, FileText, CheckSquare, MessageSquare, CreditCard, Settings, LogOut, Home } from "lucide-react";
+import { useListMyMessages } from "@workspace/api-client-react";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const { signOut } = useAuth();
   const [location] = useLocation();
+  const { data: messages } = useListMyMessages();
+
+  const unreadCount = messages
+    ? messages.filter((m) => m.senderRole !== "client" && !m.readAt).length
+    : 0;
 
   const navItems = [
     { href: "/portal", label: "Dashboard", icon: LayoutDashboard },
     { href: "/portal/documents", label: "Documents", icon: FileText },
     { href: "/portal/plan", label: "Approval Plan", icon: CheckSquare },
-    { href: "/portal/messages", label: "Messages", icon: MessageSquare },
+    { href: "/portal/messages", label: "Messages", icon: MessageSquare, badge: unreadCount },
     { href: "/portal/billing", label: "Billing", icon: CreditCard },
+    { href: "/portal/rental-history", label: "Rental History", icon: Home },
     { href: "/portal/settings", label: "Settings", icon: Settings },
   ];
 
@@ -35,6 +42,11 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               }`}>
                 <item.icon className="h-4 w-4" />
                 {item.label}
+                {item.badge != null && item.badge > 0 && (
+                  <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {item.badge > 99 ? "99+" : item.badge}
+                  </span>
+                )}
               </div>
             </Link>
           ))}

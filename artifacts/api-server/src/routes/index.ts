@@ -7,6 +7,7 @@ import tradelineRouter from "./tradeline";
 import clientRouter from "./client";
 import adminRouter from "./admin";
 import addOnsRouter from "./add-ons";
+import newsletterRouter from "./newsletter";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use("/tradeline", tradelineRouter);
 router.use("/clients", clientRouter);
 router.use("/admin", adminRouter);
 router.use("/add-ons", addOnsRouter);
+router.use("/newsletter", newsletterRouter);
 
 export default router;

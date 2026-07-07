@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import { supabase } from "../lib/supabase";
 import { requireAuth, requireAdmin, AuthRequest } from "../lib/auth-middleware";
 
@@ -35,6 +36,18 @@ function mapAddOn(row: Record<string, unknown>) {
     updatedAt: row.updated_at,
   };
 }
+
+const AddOnSchema = z.object({
+  packageId: z.string().uuid().optional(),
+  name: z.string().min(1).max(200),
+  price: z.number().nonnegative().optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+});
+
+const AddOnUpdateSchema = z.object({
+  status: z.enum(["active", "completed", "cancelled"]).optional(),
+  notes: z.string().max(1000).optional().nullable(),
+});
 
 // GET /add-ons — list all active add-on packages (public)
 router.get("/", async (_req, res) => {
@@ -89,17 +102,13 @@ router.get("/me", requireAuth, async (req: AuthRequest, res) => {
 // POST /add-ons/me — attach an add-on to the current client's active case
 router.post("/me", requireAuth, async (req: AuthRequest, res) => {
   const userId = req.userId!;
-  const { packageId, name, price, notes } = req.body as {
-    packageId?: string;
-    name: string;
-    price?: number;
-    notes?: string;
-  };
 
-  if (!name) {
-    res.status(400).json({ error: "name is required" });
+  const parsed = AddOnSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
     return;
   }
+  const { packageId, name, price, notes } = parsed.data;
 
   const { data: caseData } = await supabase
     .from("cases")
@@ -157,17 +166,13 @@ router.get("/admin/:caseId", requireAuth, requireAdmin, async (req: AuthRequest,
 // POST /add-ons/admin/:caseId — add an add-on to any client's case (admin)
 router.post("/admin/:caseId", requireAuth, requireAdmin, async (req: AuthRequest, res) => {
   const { caseId } = req.params;
-  const { packageId, name, price, notes } = req.body as {
-    packageId?: string;
-    name: string;
-    price?: number;
-    notes?: string;
-  };
 
-  if (!name) {
-    res.status(400).json({ error: "name is required" });
+  const parsed = AddOnSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
     return;
   }
+  const { packageId, name, price, notes } = parsed.data;
 
   const { data, error } = await supabase
     .from("add_ons")
@@ -193,7 +198,13 @@ router.post("/admin/:caseId", requireAuth, requireAdmin, async (req: AuthRequest
 // PUT /add-ons/admin/item/:id — update an add-on's status or notes (admin)
 router.put("/admin/item/:id", requireAuth, requireAdmin, async (req: AuthRequest, res) => {
   const { id } = req.params;
-  const { status, notes } = req.body as { status?: string; notes?: string };
+
+  const parsed = AddOnUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const { status, notes } = parsed.data;
 
   const { data, error } = await supabase
     .from("add_ons")

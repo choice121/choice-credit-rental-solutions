@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useListMyDocuments, useUploadDocument } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { FileText, Upload, CheckCircle2, Clock, AlertCircle, Download, Sparkles } from "lucide-react";
@@ -61,10 +62,11 @@ const docTypeEmoji: Record<string, string> = {
 };
 
 export default function Documents() {
-  const { data: documents, isLoading, refetch } = useListMyDocuments();
+  const { data: documents, isLoading } = useListMyDocuments();
   const uploadDocument = useUploadDocument();
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
 
   // Generated documents
@@ -110,7 +112,7 @@ export default function Documents() {
         {
           onSuccess: () => {
             toast({ title: "Document Uploaded", description: "Your document has been submitted for review." });
-            refetch();
+            queryClient.invalidateQueries({ queryKey: ["listMyDocuments"] });
             setIsUploading(false);
             if (e.target) e.target.value = "";
           },

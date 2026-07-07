@@ -7,14 +7,39 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useListMyInvoices, useSelectPaymentMethod } from "@workspace/api-client-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Receipt } from "lucide-react";
+import { CreditCard, Receipt, Package } from "lucide-react";
 import { PaymentSelectionMethod } from "@workspace/api-client-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+
+async function getToken() {
+  if (!supabase) return null;
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
+}
+
+interface AddOn {
+  id: string;
+  name: string;
+  price: number;
+  description?: string | null;
+  category?: string | null;
+}
+
+interface MyAddOn {
+  id: string;
+  name: string;
+  price: number;
+  status: string;
+  createdAt?: string;
+}
 
 export default function Billing() {
   const { data: invoices, isLoading, refetch } = useListMyInvoices();
   const selectPaymentMethod = useSelectPaymentMethod();
   const { toast } = useToast();
-  
+  const queryClient = useQueryClient();
+
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
 
   const paymentMethods = [
@@ -25,6 +50,52 @@ export default function Billing() {
     { id: 'googlepay' as PaymentSelectionMethod, name: 'Google Pay', color: 'bg-white hover:bg-gray-100 text-gray-900 border' },
     { id: 'venmo' as PaymentSelectionMethod, name: 'Venmo', color: 'bg-[#008CFF] hover:bg-[#008CFF]/90 text-white' },
   ];
+
+  // Available add-ons (public)
+  const { data: availableAddOns = [], isLoading: addOnsLoading } = useQuery<AddOn[]>({
+    queryKey: ["available-add-ons"],
+    queryFn: async () => {
+      const res = await fetch("/api/add-ons");
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  // My active add-ons (auth required)
+  const { data: myAddOns = [], isLoading: myAddOnsLoading } = useQuery<MyAddOn[]>({
+    queryKey: ["my-add-ons"],
+    queryFn: async () => {
+      const token = await getToken();
+      const res = await fetch("/api/add-ons/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
+  const addAddOnMutation = useMutation({
+    mutationFn: async (pkg: { packageId: string; name: string; price: number }) => {
+      const token = await getToken();
+      const res = await fetch("/api/add-ons/me", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(pkg),
+      });
+      if (!res.ok) throw new Error("Failed to add add-on");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-add-ons"] });
+      toast({ title: "Add-on added", description: "The add-on has been added to your plan." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add add-on. Please try again.", variant: "destructive" });
+    },
+  });
 
   const handlePaymentSelect = (method: PaymentSelectionMethod) => {
     if (!selectedInvoice) return;
@@ -38,9 +109,16 @@ export default function Billing() {
           description: data.message,
         });
         setSelectedInvoice(null);
+        queryClient.invalidateQueries({ queryKey: ["listMyInvoices"] });
         refetch();
       }
     });
+  };
+
+  const statusBadgeVariant = (status: string) => {
+    if (status === "active") return "default";
+    if (status === "cancelled") return "destructive";
+    return "secondary";
   };
 
   return (
@@ -88,19 +166,19 @@ export default function Billing() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col sm:items-end gap-2">
                     <div className="text-2xl font-bold font-mono">
                       ${invoice.amount.toFixed(2)}
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={
-                        invoice.status === 'paid' ? 'default' : 
+                        invoice.status === 'paid' ? 'default' :
                         invoice.status === 'cancelled' ? 'destructive' : 'secondary'
                       } className={invoice.status === 'paid' ? 'bg-green-500 hover:bg-green-600' : ''}>
                         {invoice.status.toUpperCase()}
                       </Badge>
-                      
+
                       {invoice.status === 'pending' && (
                         <Button size="sm" onClick={() => setSelectedInvoice(invoice.id)}>
                           <CreditCard className="w-4 h-4 mr-2" />
@@ -116,6 +194,86 @@ export default function Billing() {
         </CardContent>
       </Card>
 
+      {/* My Add-Ons */}
+      <Card className="shadow-sm mt-6">
+        <CardHeader>
+          <CardTitle>My Add-Ons</CardTitle>
+          <CardDescription>Add-on services currently on your plan</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {myAddOnsLoading ? (
+            <div className="space-y-3">
+              {[1, 2].map((i) => <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />)}
+            </div>
+          ) : myAddOns.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No active add-ons. Browse available services below.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {myAddOns.map((addon) => (
+                <div key={addon.id} className="flex items-center justify-between p-4 rounded-lg border">
+                  <div className="flex items-center gap-3">
+                    <Package className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-medium">{addon.name}</p>
+                      <p className="text-sm text-muted-foreground">${addon.price.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <Badge variant={statusBadgeVariant(addon.status)} className={addon.status === "active" ? "bg-green-500 hover:bg-green-600" : ""}>
+                    {addon.status.toUpperCase()}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Available Add-On Services */}
+      <Card className="shadow-sm mt-6">
+        <CardHeader>
+          <CardTitle>Available Add-On Services</CardTitle>
+          <CardDescription>Enhance your plan with additional services</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {addOnsLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />)}
+            </div>
+          ) : availableAddOns.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No add-on services available at this time.
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4">
+              {availableAddOns.map((addon) => (
+                <div key={addon.id} className="p-4 rounded-lg border flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-semibold">{addon.name}</p>
+                      {addon.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{addon.description}</p>
+                      )}
+                    </div>
+                    <span className="font-bold font-mono text-lg shrink-0">${addon.price.toFixed(2)}</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    disabled={addAddOnMutation.isPending}
+                    onClick={() => addAddOnMutation.mutate({ packageId: addon.id, name: addon.name, price: addon.price })}
+                  >
+                    Add to My Plan
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -124,7 +282,7 @@ export default function Billing() {
               Choose how you'd like to pay. Your advisor will contact you with specific payment details.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-2 gap-4 py-4">
             {paymentMethods.map(method => (
               <Button

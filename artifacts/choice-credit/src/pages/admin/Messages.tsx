@@ -6,12 +6,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Link } from "wouter";
 import { MessageSquare, ChevronRight } from "lucide-react";
+import type { Message } from "@workspace/api-client-react";
+
+interface Thread {
+  clientId: string;
+  clientName: string;
+  lastMessage: Message;
+  unreadCount: number;
+}
 
 export default function Messages() {
   const { data: messages, isLoading } = useListAdminMessages();
 
   // Group messages by client for a high-level view
-  const threads = messages?.reduce((acc: any, msg) => {
+  const threads = messages?.reduce((acc: Record<string, Thread>, msg: Message) => {
     if (!msg.clientId) return acc;
     if (!acc[msg.clientId]) {
       acc[msg.clientId] = {
@@ -34,9 +42,9 @@ export default function Messages() {
       acc[msg.clientId].clientName = msg.senderName;
     }
     return acc;
-  }, {});
+  }, {} as Record<string, Thread>);
 
-  const threadList = Object.values(threads || {}).sort((a: any, b: any) => 
+  const threadList = Object.values(threads || {}).sort((a: Thread, b: Thread) =>
     new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime()
   );
 
@@ -66,7 +74,7 @@ export default function Messages() {
                 No messages found.
               </div>
             ) : (
-              threadList.map((thread: any) => (
+              threadList.map((thread: Thread) => (
                 <Link key={thread.clientId} href={`/admin/clients/${thread.clientId}`}>
                   <div className="p-4 sm:p-6 flex items-center gap-4 hover:bg-muted/30 transition-colors cursor-pointer group">
                     <Avatar className="w-12 h-12 shrink-0 border border-primary/20">

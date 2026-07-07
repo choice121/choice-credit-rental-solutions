@@ -1,9 +1,12 @@
 import { Router } from "express";
+import { z } from "zod";
 import { supabase } from "../lib/supabase";
 import { requireAuth, AuthRequest } from "../lib/auth-middleware";
 import { sendEmail, buildPaymentSelectedEmail } from "../lib/email";
 
 const router = Router();
+
+const INTERNAL_ERROR = "An internal error occurred. Please try again.";
 
 // GET /clients/me
 router.get("/me", requireAuth, async (req: AuthRequest, res) => {
@@ -31,11 +34,20 @@ router.get("/me", requireAuth, async (req: AuthRequest, res) => {
 
 // PUT /clients/me
 router.put("/me", requireAuth, async (req: AuthRequest, res) => {
-  const { fullName, phone } = req.body;
+  const UpdateSchema = z.object({
+    fullName: z.string().min(2).max(100).optional(),
+    phone: z.string().max(20).optional().nullable(),
+  });
+  const parsed = UpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const { fullName, phone } = parsed.data;
 
   const { data, error } = await supabase
     .from("profiles")
-    .update({ full_name: fullName, phone: phone || null, updated_at: new Date().toISOString() })
+    .update({ full_name: fullName, phone: phone ?? null, updated_at: new Date().toISOString() })
     .eq("id", req.userId!)
     .select()
     .single();
@@ -105,7 +117,18 @@ router.get("/me/documents", requireAuth, async (req: AuthRequest, res) => {
 
 // POST /clients/me/documents
 router.post("/me/documents", requireAuth, async (req: AuthRequest, res) => {
-  const { name, fileUrl, fileType, caseId } = req.body;
+  const DocSchema = z.object({
+    name: z.string().min(1).max(255),
+    fileUrl: z.string().url(),
+    fileType: z.string().max(100),
+    caseId: z.string().uuid().optional(),
+  });
+  const parsed = DocSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const { name, fileUrl, fileType, caseId } = parsed.data;
 
   const { data, error } = await supabase
     .from("documents")
@@ -230,7 +253,16 @@ router.get("/me/messages", requireAuth, async (req: AuthRequest, res) => {
 
 // POST /clients/me/messages
 router.post("/me/messages", requireAuth, async (req: AuthRequest, res) => {
-  const { content, caseId } = req.body;
+  const MsgSchema = z.object({
+    content: z.string().min(1).max(5000),
+  });
+  const parsed = MsgSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const { content } = parsed.data;
+  const { caseId } = req.body;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -339,6 +371,187 @@ router.post("/me/payment-selection", requireAuth, async (req: AuthRequest, res) 
     method,
     message: `Your advisor will reach out with ${methodLabels[method]} payment details shortly.`,
   });
+});
+
+// GET /clients/me/rental-history
+router.get("/me/rental-history", requireAuth, async (req: AuthRequest, res) => {
+  const { data, error } = await supabase
+    .from("rental_history")
+    .select("*")
+    .eq("client_id", req.userId!)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    res.status(500).json({ error: INTERNAL_ERROR });
+    return;
+  }
+
+  res.json((data || []).map((r: Record<string, unknown>) => ({
+    id: r.id,
+    clientId: r.client_id,
+    address: r.address,
+    city: r.city,
+    state: r.state,
+    zipCode: r.zip_code,
+    moveInDate: r.move_in_date,
+    moveOutDate: r.move_out_date,
+    isCurrent: r.is_current,
+    monthlyRent: r.monthly_rent,
+    landlordName: r.landlord_name,
+    landlordPhone: r.landlord_phone,
+    landlordEmail: r.landlord_email,
+    paymentHistory: r.payment_history,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  })));
+});
+
+const RentalHistorySchema = z.object({
+  address: z.string().min(1).max(255),
+  city: z.string().min(1).max(100),
+  state: z.string().min(1).max(50),
+  zipCode: z.string().min(1).max(20),
+  moveInDate: z.string(),
+  moveOutDate: z.string().optional().nullable(),
+  isCurrent: z.boolean().default(false),
+  monthlyRent: z.number().optional().nullable(),
+  landlordName: z.string().max(100).optional().nullable(),
+  landlordPhone: z.string().max(30).optional().nullable(),
+  landlordEmail: z.string().email().optional().nullable(),
+  paymentHistory: z.string().max(50).optional().nullable(),
+});
+
+// POST /clients/me/rental-history
+router.post("/me/rental-history", requireAuth, async (req: AuthRequest, res) => {
+  const parsed = RentalHistorySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const d = parsed.data;
+
+  const { data, error } = await supabase
+    .from("rental_history")
+    .insert({
+      client_id: req.userId!,
+      address: d.address,
+      city: d.city,
+      state: d.state,
+      zip_code: d.zipCode,
+      move_in_date: d.moveInDate,
+      move_out_date: d.moveOutDate ?? null,
+      is_current: d.isCurrent,
+      monthly_rent: d.monthlyRent ?? null,
+      landlord_name: d.landlordName ?? null,
+      landlord_phone: d.landlordPhone ?? null,
+      landlord_email: d.landlordEmail ?? null,
+      payment_history: d.paymentHistory ?? null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    res.status(500).json({ error: INTERNAL_ERROR });
+    return;
+  }
+
+  const r = data as Record<string, unknown>;
+  res.status(201).json({
+    id: r.id,
+    clientId: r.client_id,
+    address: r.address,
+    city: r.city,
+    state: r.state,
+    zipCode: r.zip_code,
+    moveInDate: r.move_in_date,
+    moveOutDate: r.move_out_date,
+    isCurrent: r.is_current,
+    monthlyRent: r.monthly_rent,
+    landlordName: r.landlord_name,
+    landlordPhone: r.landlord_phone,
+    landlordEmail: r.landlord_email,
+    paymentHistory: r.payment_history,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  });
+});
+
+// PUT /clients/me/rental-history/:id
+router.put("/me/rental-history/:id", requireAuth, async (req: AuthRequest, res) => {
+  const { id } = req.params;
+  const UpdateSchema = RentalHistorySchema.partial();
+  const parsed = UpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.errors[0].message });
+    return;
+  }
+  const d = parsed.data;
+
+  const updatePayload: Record<string, unknown> = {};
+  if (d.address !== undefined) updatePayload.address = d.address;
+  if (d.city !== undefined) updatePayload.city = d.city;
+  if (d.state !== undefined) updatePayload.state = d.state;
+  if (d.zipCode !== undefined) updatePayload.zip_code = d.zipCode;
+  if (d.moveInDate !== undefined) updatePayload.move_in_date = d.moveInDate;
+  if (d.moveOutDate !== undefined) updatePayload.move_out_date = d.moveOutDate ?? null;
+  if (d.isCurrent !== undefined) updatePayload.is_current = d.isCurrent;
+  if (d.monthlyRent !== undefined) updatePayload.monthly_rent = d.monthlyRent ?? null;
+  if (d.landlordName !== undefined) updatePayload.landlord_name = d.landlordName ?? null;
+  if (d.landlordPhone !== undefined) updatePayload.landlord_phone = d.landlordPhone ?? null;
+  if (d.landlordEmail !== undefined) updatePayload.landlord_email = d.landlordEmail ?? null;
+  if (d.paymentHistory !== undefined) updatePayload.payment_history = d.paymentHistory ?? null;
+  updatePayload.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("rental_history")
+    .update(updatePayload)
+    .eq("id", id)
+    .eq("client_id", req.userId!)
+    .select()
+    .single();
+
+  if (error) {
+    res.status(500).json({ error: INTERNAL_ERROR });
+    return;
+  }
+
+  const r = data as Record<string, unknown>;
+  res.json({
+    id: r.id,
+    clientId: r.client_id,
+    address: r.address,
+    city: r.city,
+    state: r.state,
+    zipCode: r.zip_code,
+    moveInDate: r.move_in_date,
+    moveOutDate: r.move_out_date,
+    isCurrent: r.is_current,
+    monthlyRent: r.monthly_rent,
+    landlordName: r.landlord_name,
+    landlordPhone: r.landlord_phone,
+    landlordEmail: r.landlord_email,
+    paymentHistory: r.payment_history,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  });
+});
+
+// DELETE /clients/me/rental-history/:id
+router.delete("/me/rental-history/:id", requireAuth, async (req: AuthRequest, res) => {
+  const { id } = req.params;
+
+  const { error } = await supabase
+    .from("rental_history")
+    .delete()
+    .eq("id", id)
+    .eq("client_id", req.userId!);
+
+  if (error) {
+    res.status(500).json({ error: INTERNAL_ERROR });
+    return;
+  }
+
+  res.status(204).send();
 });
 
 export default router;

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "wouter";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,16 +18,21 @@ import {
   useUpdateInvoiceStatus,
   useCreateAdminCase,
   useCreateAdminInvoice,
+  useAdminListCaseAddOns,
+  useAdminCreateCaseAddOn,
+  useAdminUpdateAddOn,
+  useListAddOnPackages,
 } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft, FileText, CheckCircle2, Clock, AlertCircle,
-  Send, Plus, DollarSign, Briefcase,
+  Send, Plus, DollarSign, Briefcase, Package,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { format } from "date-fns";
-import { CaseStatus, DocumentReviewStatus, PlanStepStatus, InvoiceStatusUpdateStatus } from "@workspace/api-client-react";
+import { CaseStatus, DocumentReviewStatus, PlanStepStatus, InvoiceStatusUpdateStatus, AddOnUpdateStatus } from "@workspace/api-client-react";
+import type { AddOn, Package as PackageType } from "@workspace/api-client-react";
 
 export default function ClientDetail() {
   const params = useParams();
@@ -41,7 +46,15 @@ export default function ClientDetail() {
   const updateInvoiceStatus = useUpdateInvoiceStatus();
   const createCase = useCreateAdminCase();
   const createInvoice = useCreateAdminInvoice();
+  const updateAddOn = useAdminUpdateAddOn();
+  const createAddOn = useAdminCreateCaseAddOn();
   const { toast } = useToast();
+
+  const caseId = client?.case?.id;
+  const { data: addOns, refetch: refetchAddOns } = useAdminListCaseAddOns(caseId ?? "", {
+    query: { enabled: !!caseId },
+  });
+  const { data: addOnPackages } = useListAddOnPackages();
 
   const [messageContent, setMessageContent] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,6 +71,13 @@ export default function ClientDetail() {
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [newInvoicePkg, setNewInvoicePkg] = useState("");
   const [newInvoiceAmount, setNewInvoiceAmount] = useState("");
+
+  // Add-On state
+  const [showAddOnForm, setShowAddOnForm] = useState(false);
+  const [newAddOnName, setNewAddOnName] = useState("");
+  const [newAddOnPrice, setNewAddOnPrice] = useState("");
+  const [newAddOnPkgId, setNewAddOnPkgId] = useState("");
+  const [newAddOnNotes, setNewAddOnNotes] = useState("");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -180,6 +200,60 @@ export default function ClientDetail() {
     );
   };
 
+  const handleUpdateAddOn = (addOnId: string, status: AddOnUpdateStatus) => {
+    updateAddOn.mutate(
+      { id: addOnId, data: { status } },
+      {
+        onSuccess: () => { toast({ title: "Add-on updated" }); refetchAddOns(); },
+        onError: () => { toast({ title: "Failed to update add-on", variant: "destructive" }); },
+      }
+    );
+  };
+
+  const handleCreateAddOn = () => {
+    if (!caseId) return;
+    const selectedPkg = addOnPackages?.find((p: PackageType) => p.id === newAddOnPkgId);
+    const name = selectedPkg?.name || newAddOnName.trim();
+    const price = newAddOnPrice ? parseFloat(newAddOnPrice) : (selectedPkg?.price ?? null);
+    if (!name) {
+      toast({ title: "Add-on name is required", variant: "destructive" });
+      return;
+    }
+    createAddOn.mutate(
+      {
+        caseId,
+        data: {
+          packageId: newAddOnPkgId || null,
+          name,
+          price,
+          notes: newAddOnNotes.trim() || null,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast({ title: "Add-on created" });
+          setNewAddOnName("");
+          setNewAddOnPrice("");
+          setNewAddOnPkgId("");
+          setNewAddOnNotes("");
+          setShowAddOnForm(false);
+          refetchAddOns();
+        },
+        onError: () => {
+          toast({ title: "Failed to create add-on", variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  const getAddOnStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed": return <Badge className="bg-green-500">Completed</Badge>;
+      case "cancelled": return <Badge variant="destructive">Cancelled</Badge>;
+      default: return <Badge variant="secondary">Active</Badge>;
+    }
+  };
+
   if (isLoading) return (
     <AdminLayout>
       <div className="p-6 lg:p-8 space-y-6">
@@ -209,6 +283,13 @@ export default function ClientDetail() {
 
   return (
     <AdminLayout>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <Link href="/admin/clients" className="hover:text-foreground transition-colors">Clients</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{client.fullName}</span>
+      </div>
+
       <div className="mb-6 flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/admin/clients"><ArrowLeft className="w-4 h-4" /></Link>
@@ -305,6 +386,12 @@ export default function ClientDetail() {
                   Invoices
                   {client.invoices && client.invoices.length > 0 && (
                     <Badge variant="secondary" className="ml-1.5 text-xs h-4">{client.invoices.length}</Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="addons" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none bg-transparent shrink-0">
+                  Add-Ons
+                  {addOns && addOns.length > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 text-xs h-4">{addOns.length}</Badge>
                   )}
                 </TabsTrigger>
               </TabsList>
@@ -614,6 +701,154 @@ export default function ClientDetail() {
                               <SelectItem value="cancelled">Cancel</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* ── Add-Ons tab ── */}
+              <TabsContent value="addons" className="mt-0 space-y-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-serif text-lg font-bold">Add-Ons</h3>
+                  {caseId ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setShowAddOnForm((v) => !v)}
+                      variant={showAddOnForm ? "outline" : "default"}
+                    >
+                      {showAddOnForm ? "Cancel" : (
+                        <><Plus className="w-4 h-4 mr-1.5" /> Add Add-On</>
+                      )}
+                    </Button>
+                  ) : null}
+                </div>
+
+                {!caseId && (
+                  <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                    <Package className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-40" />
+                    <p className="text-muted-foreground text-sm">Create a case first to manage add-ons.</p>
+                  </div>
+                )}
+
+                {caseId && showAddOnForm && (
+                  <div className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                    <p className="text-sm font-medium">New Add-On</p>
+                    {addOnPackages && addOnPackages.length > 0 && (
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Select from packages (optional)</Label>
+                        <Select value={newAddOnPkgId} onValueChange={(val) => {
+                          setNewAddOnPkgId(val);
+                          const pkg = addOnPackages.find((p: PackageType) => p.id === val);
+                          if (pkg) {
+                            setNewAddOnName(pkg.name);
+                            setNewAddOnPrice(pkg.price ? String(pkg.price) : "");
+                          }
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a package..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Custom</SelectItem>
+                            {addOnPackages.map((pkg: PackageType) => (
+                              <SelectItem key={pkg.id} value={pkg.id}>
+                                {pkg.name}{pkg.price ? ` — $${pkg.price}` : ""}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Name</Label>
+                        <Input
+                          value={newAddOnName}
+                          onChange={(e) => setNewAddOnName(e.target.value)}
+                          placeholder="Add-on name"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Price ($)</Label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input
+                            value={newAddOnPrice}
+                            onChange={(e) => setNewAddOnPrice(e.target.value)}
+                            placeholder="0.00"
+                            type="number"
+                            min={0}
+                            step={0.01}
+                            className="pl-8"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Notes (optional)</Label>
+                      <Textarea
+                        value={newAddOnNotes}
+                        onChange={(e) => setNewAddOnNotes(e.target.value)}
+                        placeholder="Internal notes..."
+                        className="resize-none min-h-[60px] text-sm"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleCreateAddOn}
+                      disabled={createAddOn.isPending}
+                      className="w-full sm:w-auto"
+                    >
+                      {createAddOn.isPending ? "Creating..." : "Create Add-On"}
+                    </Button>
+                  </div>
+                )}
+
+                {caseId && (!addOns || addOns.length === 0) && !showAddOnForm && (
+                  <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                    <Package className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-40" />
+                    <p className="text-muted-foreground text-sm">No add-ons yet. Add one above.</p>
+                  </div>
+                )}
+
+                {caseId && addOns && addOns.length > 0 && (
+                  <div className="space-y-3">
+                    {addOns.map((addon: AddOn) => (
+                      <div key={addon.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4">
+                        <div>
+                          <p className="font-medium">{addon.name}</p>
+                          {addon.price != null && (
+                            <p className="text-sm text-muted-foreground">${Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                          )}
+                          {addon.notes && (
+                            <p className="text-xs text-muted-foreground mt-1 italic">{addon.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {getAddOnStatusBadge(addon.status)}
+                          {addon.status === "active" && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs h-7"
+                                onClick={() => handleUpdateAddOn(addon.id, "completed" as AddOnUpdateStatus)}
+                                disabled={updateAddOn.isPending}
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                                Complete
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-xs h-7 text-destructive hover:text-destructive"
+                                onClick={() => handleUpdateAddOn(addon.id, "cancelled" as AddOnUpdateStatus)}
+                                disabled={updateAddOn.isPending}
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}

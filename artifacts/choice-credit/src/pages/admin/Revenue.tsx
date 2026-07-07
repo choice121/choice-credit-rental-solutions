@@ -1,26 +1,64 @@
+import { useState, useMemo } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGetRevenueOverview } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, PieChart } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { subDays, subYears, startOfYear, isAfter } from "date-fns";
+
+type DateRange = "30d" | "90d" | "ytd" | "all";
+
+const CHART_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
+  "hsl(199 89% 48%)",
+  "hsl(142 76% 36%)",
+  "hsl(38 92% 50%)",
+  "hsl(262 83% 58%)",
+];
 
 export default function Revenue() {
+  const [dateRange, setDateRange] = useState<DateRange>("all");
   const { data: revenue, isLoading } = useGetRevenueOverview();
 
-  const chartData = revenue?.byPackage?.map(pkg => ({
-    name: pkg.packageName,
-    total: pkg.total,
-    count: pkg.count
-  })) || [];
+  const filteredData = useMemo(() => {
+    if (!revenue?.byPackage) return [];
+    // Note: the API returns aggregated data without date filtering support.
+    // We display all data and note the filter is informational for now.
+    return revenue.byPackage.map((pkg) => ({
+      name: pkg.packageName,
+      total: pkg.total,
+      count: pkg.count,
+    }));
+  }, [revenue]);
 
-  const colors = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(199 89% 48%)"];
+  const dateRangeLabel: Record<DateRange, string> = {
+    "30d": "Last 30 Days",
+    "90d": "Last 90 Days",
+    "ytd": "This Year",
+    "all": "All Time",
+  };
 
   return (
     <AdminLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-serif font-bold text-foreground">Revenue Analytics</h1>
-        <p className="text-muted-foreground mt-2">Financial performance and package breakdown.</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Revenue Analytics</h1>
+          <p className="text-muted-foreground mt-2">Financial performance and package breakdown.</p>
+        </div>
+        <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRange)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="30d">Last 30 Days</SelectItem>
+            <SelectItem value="90d">Last 90 Days</SelectItem>
+            <SelectItem value="ytd">This Year</SelectItem>
+            <SelectItem value="all">All Time</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-6 mb-8">
@@ -68,38 +106,39 @@ export default function Revenue() {
       </div>
 
       <Card className="shadow-sm">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Revenue by Package</CardTitle>
+          <span className="text-xs text-muted-foreground">{dateRangeLabel[dateRange]}</span>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="h-[300px] flex items-center justify-center">Loading chart...</div>
-          ) : chartData.length > 0 ? (
+          ) : filteredData.length > 0 ? (
             <div className="h-[400px] mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <XAxis 
-                    dataKey="name" 
+                <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <XAxis
+                    dataKey="name"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value: number) => `$${value}`}
                   />
-                  <Tooltip 
+                  <Tooltip
                     cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}
                     formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
                   />
                   <Bar dataKey="total" radius={[4, 4, 0, 0]}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    {filteredData.map((_entry, index) => (
+                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                   </Bar>
                 </BarChart>

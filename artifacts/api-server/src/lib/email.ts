@@ -3,7 +3,7 @@ import { logger } from "./logger";
 const GAS_URL = process.env.GAS_EMAIL_URL;
 
 interface EmailPayload {
-  type: "new_lead" | "new_contact" | "payment_selected" | "document_uploaded";
+  type: "new_lead" | "new_contact" | "payment_selected" | "document_uploaded" | "document_reviewed" | "new_message" | "invoice_created";
   to?: string;
   subject: string;
   body: string;
@@ -114,6 +114,78 @@ export function buildPaymentSelectedEmail(data: {
       `Amount:         ${data.amount ? `$${data.amount}` : "See invoice"}`,
       ``,
       `Action required: Send the client your ${label} payment details so they can complete their payment.`,
+    ].join("\n"),
+    data,
+  };
+}
+
+export function buildDocumentReviewedEmail(data: {
+  clientName: string;
+  clientEmail: string;
+  documentName: string;
+  status: string;
+  advisorNotes?: string | null;
+}): EmailPayload {
+  return {
+    type: "document_reviewed",
+    to: data.clientEmail,
+    subject: `📄 Your Document Has Been Reviewed — ${data.documentName}`,
+    body: [
+      `Hello ${data.clientName},`,
+      ``,
+      `Your document has been reviewed by your advisor.`,
+      ``,
+      `Document:      ${data.documentName}`,
+      `Status:        ${data.status}`,
+      `Advisor Notes: ${data.advisorNotes || "No additional notes"}`,
+      ``,
+      `Log in to your dashboard to view your documents and next steps.`,
+    ].join("\n"),
+    data,
+  };
+}
+
+export function buildNewMessageEmail(data: {
+  clientName: string;
+  clientEmail: string;
+  advisorName: string;
+}): EmailPayload {
+  return {
+    type: "new_message",
+    to: data.clientEmail,
+    subject: `💬 New Message from Your Advisor — ${data.advisorName}`,
+    body: [
+      `Hello ${data.clientName},`,
+      ``,
+      `You have a new message from your advisor, ${data.advisorName}.`,
+      ``,
+      `Log in to your dashboard to read and reply to the message.`,
+    ].join("\n"),
+    data,
+  };
+}
+
+export function buildInvoiceCreatedEmail(data: {
+  clientName: string;
+  clientEmail: string;
+  invoiceId: string;
+  amount: number;
+  packageName: string;
+}): EmailPayload {
+  return {
+    type: "invoice_created",
+    to: data.clientEmail,
+    subject: `🧾 New Invoice — ${data.packageName}`,
+    body: [
+      `Hello ${data.clientName},`,
+      ``,
+      `A new invoice has been created for your account.`,
+      ``,
+      `Package:    ${data.packageName}`,
+      `Amount:     $${data.amount}`,
+      `Invoice ID: ${data.invoiceId}`,
+      ``,
+      `Log in to your dashboard to view your invoice and select a payment method.`,
     ].join("\n"),
     data,
   };

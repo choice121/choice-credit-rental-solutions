@@ -3,6 +3,8 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useListAdminMessages } from "@workspace/api-client-react";
+import type { Message } from "@workspace/api-client-react";
 import {
   Building2,
   LayoutDashboard,
@@ -14,6 +16,7 @@ import {
   Menu,
   ImagePlay,
   FileText,
+  Package,
 } from "lucide-react";
 
 const navItems = [
@@ -22,15 +25,17 @@ const navItems = [
   { href: "/admin/leads", label: "Leads", icon: UserPlus },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
+  { href: "/admin/packages", label: "Packages", icon: Package },
   { href: "/admin/documents", label: "Doc Generator", icon: FileText },
   { href: "/admin/image-generator", label: "Image Generator", icon: ImagePlay },
 ];
 
-function NavItem({ href, label, icon: Icon, location, onClick }: {
+function NavItem({ href, label, icon: Icon, location, badge, onClick }: {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   location: string;
+  badge?: number;
   onClick?: () => void;
 }) {
   const isActive =
@@ -46,7 +51,12 @@ function NavItem({ href, label, icon: Icon, location, onClick }: {
         }`}
       >
         <Icon className="h-4 w-4" />
-        {label}
+        <span className="flex-1">{label}</span>
+        {badge != null && badge > 0 && (
+          <span className="bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1">
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
       </div>
     </Link>
   );
@@ -56,6 +66,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { signOut } = useAuth();
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: messages } = useListAdminMessages();
+
+  // Count threads with unread messages from clients
+  const unreadCount = (() => {
+    if (!messages) return 0;
+    const threadUnread: Record<string, boolean> = {};
+    messages.forEach((msg: Message) => {
+      if (msg.clientId && msg.senderRole === "client" && !msg.readAt) {
+        threadUnread[msg.clientId] = true;
+      }
+    });
+    return Object.keys(threadUnread).length;
+  })();
+
+  const navItemsWithBadge = navItems.map((item) =>
+    item.href === "/admin/messages" ? { ...item, badge: unreadCount } : item
+  );
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -70,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
         </div>
         <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
+          {navItemsWithBadge.map((item) => (
             <NavItem key={item.href} {...item} location={location} />
           ))}
         </nav>
@@ -103,7 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SheetTrigger>
             <SheetContent side="left" className="w-64 bg-sidebar pt-8">
               <nav className="flex flex-col gap-1 px-2">
-                {navItems.map((item) => (
+                {navItemsWithBadge.map((item) => (
                   <NavItem
                     key={item.href}
                     {...item}

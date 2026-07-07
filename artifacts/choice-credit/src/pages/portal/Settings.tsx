@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useGetMyProfile, useUpdateMyProfile } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { User, Mail, Phone, CheckCircle2 } from "lucide-react";
 
 export default function Settings() {
-  const { data: profile, isLoading, refetch } = useGetMyProfile();
+  const { data: profile, isLoading } = useGetMyProfile();
   const updateProfile = useUpdateMyProfile();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [saved, setSaved] = useState(false);
@@ -34,7 +36,7 @@ export default function Settings() {
         onSuccess: () => {
           setSaved(true);
           setTimeout(() => setSaved(false), 2500);
-          refetch();
+          queryClient.invalidateQueries({ queryKey: ["getMyProfile"] });
         },
         onError: () => {
           toast({ title: "Update failed", description: "Please try again.", variant: "destructive" });

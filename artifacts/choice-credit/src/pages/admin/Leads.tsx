@@ -9,7 +9,7 @@ import { useListLeads, useUpdateLead } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { LeadUpdateStatus } from "@workspace/api-client-react";
-import { ChevronDown, ChevronUp, Save } from "lucide-react";
+import { ChevronDown, ChevronUp, Save, X } from "lucide-react";
 
 export default function Leads() {
   const [filter, setFilter] = useState<string>("all");
@@ -28,6 +28,24 @@ export default function Leads() {
         onSuccess: () => {
           toast({ title: "Lead status updated" });
           refetch();
+        },
+      }
+    );
+  };
+
+  const handleCloseLead = (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to close the lead for "${name}"? This will mark it as closed.`)) {
+      return;
+    }
+    updateLead.mutate(
+      { id, data: { status: "closed" as LeadUpdateStatus } },
+      {
+        onSuccess: () => {
+          toast({ title: "Lead closed" });
+          refetch();
+        },
+        onError: () => {
+          toast({ title: "Failed to close lead", variant: "destructive" });
         },
       }
     );
@@ -187,6 +205,19 @@ export default function Leads() {
                         <SelectItem value="closed">Closed</SelectItem>
                       </SelectContent>
                     </Select>
+
+                    {lead.status !== "closed" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-muted-foreground hover:text-destructive hover:border-destructive mt-1"
+                        onClick={() => handleCloseLead(lead.id, lead.fullName)}
+                        disabled={updateLead.isPending}
+                      >
+                        <X className="w-3.5 h-3.5 mr-1.5" />
+                        Close Lead
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>

@@ -106,13 +106,24 @@ export default function Book() {
   const challengeSlug = searchParams.get("challenge") || undefined;
   const matchedChallenge = RENTER_CHALLENGES.find((c) => c.slug === challengeSlug);
 
+  const fromCalculator = {
+    score: searchParams.get("score"),
+    estimate: searchParams.get("estimate"),
+  };
+
+  const calculatorSituationPrefill = fromCalculator.score
+    ? `My current credit score is ${fromCalculator.score}${fromCalculator.estimate ? ` and I'd like to reach ${fromCalculator.estimate}` : ""}. `
+    : "";
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
       email: "",
       phone: "",
-      situation: matchedChallenge ? matchedChallenge.situationPrefill : "",
+      situation: matchedChallenge
+        ? matchedChallenge.situationPrefill
+        : calculatorSituationPrefill,
       preferredTime: "morning",
       packageId: defaultPackageId
     }
@@ -181,6 +192,25 @@ export default function Book() {
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
           {/* ── Form (left, takes 3 of 5 cols) ── */}
           <div className="lg:col-span-3">
+            {fromCalculator.score && (
+              <div className="mb-8 rounded-xl border border-teal-200 bg-teal-50 px-5 py-4 flex items-start gap-3">
+                <div className="mt-0.5 text-teal-600 shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <p className="text-sm text-teal-800">
+                  Based on your estimate, your current score of{" "}
+                  <span className="font-semibold">{fromCalculator.score}</span>
+                  {fromCalculator.estimate && (
+                    <>
+                      {" "}could reach{" "}
+                      <span className="font-semibold">{fromCalculator.estimate}</span>
+                    </>
+                  )}
+                  . Our advisor will review your full profile.
+                </p>
+              </div>
+            )}
+
             {serviceSlug && !matchedChallenge && (
           <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />

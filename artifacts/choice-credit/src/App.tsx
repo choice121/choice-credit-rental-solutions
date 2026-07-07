@@ -16,6 +16,7 @@ const BookConfirmation = lazy(() => import("@/pages/public/BookConfirmation"));
 const Contact = lazy(() => import("@/pages/public/Contact"));
 const About = lazy(() => import("@/pages/public/About"));
 const Blog = lazy(() => import("@/pages/public/Blog"));
+const BlogPost = lazy(() => import("@/pages/public/BlogPost"));
 const Privacy = lazy(() => import("@/pages/public/Privacy"));
 const Terms = lazy(() => import("@/pages/public/Terms"));
 const Login = lazy(() => import("@/pages/public/Login"));
@@ -28,6 +29,7 @@ const PortalPlan = lazy(() => import("@/pages/portal/Plan"));
 const PortalMessages = lazy(() => import("@/pages/portal/Messages"));
 const PortalBilling = lazy(() => import("@/pages/portal/Billing"));
 const PortalSettings = lazy(() => import("@/pages/portal/Settings"));
+const PortalRentalHistory = lazy(() => import("@/pages/portal/RentalHistory"));
 
 // Admin pages
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
@@ -36,6 +38,7 @@ const AdminClientDetail = lazy(() => import("@/pages/admin/ClientDetail"));
 const AdminLeads = lazy(() => import("@/pages/admin/Leads"));
 const AdminMessages = lazy(() => import("@/pages/admin/Messages"));
 const AdminRevenue = lazy(() => import("@/pages/admin/Revenue"));
+const AdminPackages = lazy(() => import("@/pages/admin/Packages"));
 const AdminImageGenerator = lazy(() => import("@/image-generator/ImageGeneratorPage"));
 const AdminDocumentGenerator = lazy(() => import("@/doc-generator/DocumentGeneratorPage"));
 
@@ -67,7 +70,6 @@ function ProtectedRoute({
   if (loading) return <PageLoader />;
   if (!user) return <Redirect to="/login" />;
   if (adminOnly && !isAdmin) return <Redirect to="/portal" />;
-  if (!adminOnly && isAdmin) return <Redirect to="/admin" />;
 
   return <Component />;
 }
@@ -86,7 +88,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/about" component={About} />
         <Route path="/blog" component={Blog} />
-        <Route path="/blog/:slug">{() => <Blog />}</Route>
+        <Route path="/blog/:slug">{(params) => <BlogPost />}</Route>
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
         <Route path="/login" component={Login} />
@@ -98,6 +100,7 @@ function Router() {
         <Route path="/portal/messages">{() => <ProtectedRoute component={PortalMessages} />}</Route>
         <Route path="/portal/billing">{() => <ProtectedRoute component={PortalBilling} />}</Route>
         <Route path="/portal/settings">{() => <ProtectedRoute component={PortalSettings} />}</Route>
+        <Route path="/portal/rental-history">{() => <ProtectedRoute component={PortalRentalHistory} />}</Route>
 
         {/* Admin */}
         <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} adminOnly />}</Route>
@@ -106,6 +109,7 @@ function Router() {
         <Route path="/admin/leads">{() => <ProtectedRoute component={AdminLeads} adminOnly />}</Route>
         <Route path="/admin/messages">{() => <ProtectedRoute component={AdminMessages} adminOnly />}</Route>
         <Route path="/admin/revenue">{() => <ProtectedRoute component={AdminRevenue} adminOnly />}</Route>
+        <Route path="/admin/packages">{() => <ProtectedRoute component={AdminPackages} adminOnly />}</Route>
         <Route path="/admin/image-generator">{() => <ProtectedRoute component={AdminImageGenerator} adminOnly />}</Route>
         <Route path="/admin/documents">{() => <ProtectedRoute component={AdminDocumentGenerator} adminOnly />}</Route>
 

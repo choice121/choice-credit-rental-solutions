@@ -285,7 +285,7 @@ export default function Calculator() {
                 </div>
 
                 <Button asChild className="w-full h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-                  <Link href="/book">
+                  <Link href={`/book?score=${score}&util=${utilization}&age=${age}&estimate=${targetScore}`}>
                     Get My Free Analysis <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Link>
                 </Button>
@@ -305,7 +305,7 @@ export default function Calculator() {
                   Adjust the sliders above to see your estimate, or book a free consultation for an exact analysis.
                 </p>
                 <Button asChild className="w-full h-11">
-                  <Link href="/book">Book Your Free Analysis</Link>
+                  <Link href={`/book?score=${score}&util=${utilization}&age=${age}`}>Book Your Free Analysis</Link>
                 </Button>
               </div>
             )}

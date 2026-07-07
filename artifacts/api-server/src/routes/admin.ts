@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { supabase } from "../lib/supabase";
 import { requireAdmin, AuthRequest } from "../lib/auth-middleware";
+import { sendEmail, buildDocumentReviewedEmail, buildInvoiceCreatedEmail } from "../lib/email";
 
 const router = Router();
 
@@ -415,6 +416,19 @@ router.put("/documents/:id", requireAdmin, async (req: AuthRequest, res) => {
       return;
     }
 
+    // Fire-and-forget: notify client about document review
+    supabase.from("profiles").select("full_name, email").eq("id", data.client_id).single().then(({ data: profile }) => {
+      if (profile) {
+        sendEmail(buildDocumentReviewedEmail({
+          clientName: profile.full_name || "Client",
+          clientEmail: profile.email || "",
+          documentName: data.name,
+          status: data.status,
+          advisorNotes: data.advisor_notes,
+        })).catch((err: unknown) => console.error("Email error after doc review:", err));
+      }
+    }).catch((err: unknown) => console.error("Profile fetch error after doc review:", err));
+
     res.json({
       id: data.id, clientId: data.client_id, caseId: data.case_id,
       name: data.name, fileUrl: data.file_url, fileType: data.file_type,
@@ -544,9 +558,22 @@ router.post("/clients/:id/invoices", requireAdmin, async (req: AuthRequest, res)
 
     await supabase.from("activity_log").insert({
       type: "invoice_created",
-      description: `Invoice created: ${packageName} — $${amount}`,
+      description: `Invoice created: ${packageName} — ${amount}`,
       client_id: id,
     });
+
+    // Fire-and-forget: notify client about new invoice
+    supabase.from("profiles").select("full_name, email").eq("id", id).single().then(({ data: profile }) => {
+      if (profile) {
+        sendEmail(buildInvoiceCreatedEmail({
+          clientName: profile.full_name || "Client",
+          clientEmail: profile.email || "",
+          invoiceId: data.id,
+          amount,
+          packageName,
+        })).catch((err: unknown) => console.error("Email error after invoice creation:", err));
+      }
+    }).catch((err: unknown) => console.error("Profile fetch error after invoice creation:", err));
 
     res.status(201).json({
       id: data.id, clientId: data.client_id, caseId: data.case_id,
@@ -556,6 +583,46 @@ router.post("/clients/:id/invoices", requireAdmin, async (req: AuthRequest, res)
     });
   } catch (err) {
     console.error("Create invoice error:", err);
+    res.status(500).json({ error: INTERNAL_ERROR });
+  }
+});
+
+// GET /admin/clients/:id/rental-history
+router.get("/clients/:id/rental-history", requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await supabase
+      .from("rental_history")
+      .select("*")
+      .eq("client_id", id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Get rental history error:", error);
+      res.status(500).json({ error: INTERNAL_ERROR });
+      return;
+    }
+
+    res.json((data || []).map((r: Record<string, unknown>) => ({
+      id: r.id,
+      clientId: r.client_id,
+      address: r.address,
+      city: r.city,
+      state: r.state,
+      zipCode: r.zip_code,
+      moveInDate: r.move_in_date,
+      moveOutDate: r.move_out_date,
+      isCurrent: r.is_current,
+      monthlyRent: r.monthly_rent,
+      landlordName: r.landlord_name,
+      landlordPhone: r.landlord_phone,
+      landlordEmail: r.landlord_email,
+      paymentHistory: r.payment_history,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    })));
+  } catch (err) {
+    console.error("Get rental history error:", err);
     res.status(500).json({ error: INTERNAL_ERROR });
   }
 });

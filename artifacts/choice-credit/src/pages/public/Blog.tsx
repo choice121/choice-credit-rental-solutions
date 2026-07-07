@@ -1,9 +1,11 @@
+import { useState } from "react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Clock, ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import { useToast } from "@/hooks/use-toast";
 
 const POSTS = [
   {
@@ -69,6 +71,33 @@ const POSTS = [
 ];
 
 export default function Blog() {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error("Subscription failed");
+      setSubscribed(true);
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PublicLayout>
       {/* Hero */}
@@ -140,16 +169,29 @@ export default function Blog() {
             <p className="text-primary-foreground/70 mb-8">
               A concise PDF covering the five things that move the needle most — covering credit, documentation, and presentation. Free, no spam.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 h-12 px-4 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-              <Button className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 px-6 shrink-0">
-                Send my guide
-              </Button>
-            </div>
+            {subscribed ? (
+              <p className="text-accent font-semibold text-lg">
+                You're subscribed! We'll send updates to {email}
+              </p>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="flex-1 h-12 px-4 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 px-6 shrink-0"
+                >
+                  {loading ? "Sending..." : "Send my guide"}
+                </Button>
+              </form>
+            )}
             <p className="text-primary-foreground/40 text-xs mt-3">No spam. Unsubscribe any time.</p>
           </ScrollReveal>
         </div>
