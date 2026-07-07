@@ -1,2 +1,0 @@
-- [Cloudflare Pages pnpm build](cloudflare-pages-pnpm.md) — CF Pages needs PNPM_VERSION env var + PORT must be optional in vite.config.ts for production builds.
-- [Supabase backend pattern](supabase-backend.md) — Backend uses service role client directly; use req.userId (not req.user.id); packages table extended with slug/category/price_label/nullable price; add_ons table added with camelCase mapping requirement.
