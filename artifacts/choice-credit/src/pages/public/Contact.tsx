@@ -70,17 +70,17 @@ export default function Contact() {
       <div className="bg-card border-b py-5">
         <div className="container max-w-5xl">
           <div className="flex flex-wrap justify-center gap-6">
-            <a href="tel:18005550198" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+            <a href="sms:7070631370" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <Phone className="w-4 h-4 text-primary" />
               </div>
-              1 (800) 555-0198
+              (707) 063-1370 · Text only
             </a>
-            <a href="mailto:support@choicecredit.com" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+            <a href="mailto:choicecreditandrentalsolutions@gmail.com" className="flex items-center gap-2.5 text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <Mail className="w-4 h-4 text-primary" />
               </div>
-              support@choicecredit.com
+              choicecreditandrentalsolutions@gmail.com
             </a>
             <span className="flex items-center gap-2.5 text-sm text-foreground/60">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -109,24 +109,24 @@ export default function Contact() {
               {[
                 {
                   icon: <Phone className="w-5 h-5 text-primary" />,
-                  title: "Phone",
+                  title: "Text (no calls)",
                   sub: "Mon–Sat from 9AM to 7PM EST",
-                  value: "1 (800) 555-0198",
-                  href: "tel:18005550198",
+                  value: "(707) 063-1370",
+                  href: "sms:7070631370",
                 },
                 {
                   icon: <Mail className="w-5 h-5 text-primary" />,
                   title: "Email",
                   sub: "We respond within 24 hours",
-                  value: "support@choicecredit.com",
-                  href: "mailto:support@choicecredit.com",
+                  value: "choicecreditandrentalsolutions@gmail.com",
+                  href: "mailto:choicecreditandrentalsolutions@gmail.com",
                 },
                 {
                   icon: <MessageCircle className="w-5 h-5 text-primary" />,
                   title: "Text / SMS",
                   sub: "Fastest way to reach us",
-                  value: "Text 1 (800) 555-0198",
-                  href: "sms:18005550198",
+                  value: "Text (707) 063-1370",
+                  href: "sms:7070631370",
                 },
                 {
                   icon: <MapPin className="w-5 h-5 text-primary" />,

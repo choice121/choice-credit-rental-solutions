@@ -5,7 +5,7 @@ export const COMPANY = {
   tagline: "Credit Repair · Rental Assistance · Housing Consulting",
   address: "Atlanta, Georgia",
   phone: "(404) 555-0100",
-  email: "info@choicecreditrental.com",
+  email: "choicecreditandrentalsolutions@gmail.com",
   website: "www.choicecreditrental.com",
 };
 

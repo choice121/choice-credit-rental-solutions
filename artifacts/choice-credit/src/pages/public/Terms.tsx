@@ -32,7 +32,7 @@ Refund eligibility varies by service type:
 • Profile Building Packages: Non-refundable once tradeline placements have been initiated
 • Done-For-You Services: Non-refundable once a co-signer or lease application has been submitted
 
-We evaluate refund requests on a case-by-case basis for exceptional circumstances. Contact support@choicecredit.com to submit a refund request.`,
+We evaluate refund requests on a case-by-case basis for exceptional circumstances. Contact choicecreditandrentalsolutions@gmail.com to submit a refund request.`,
   },
   {
     title: "No Guarantee of Results",
@@ -60,7 +60,7 @@ Our total liability for any claim arising from our services shall not exceed the
   },
   {
     title: "Contact",
-    content: `If you have questions about these Terms of Service, please contact:\n\nChoice Credit & Rental Solutions\n100 Financial District Blvd, Suite 300\nNew York, NY 10005\nlegal@choicecredit.com\n1 (800) 555-0198`,
+    content: `If you have questions about these Terms of Service, please contact:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 063-1370 (text only)`,
   },
 ];
 

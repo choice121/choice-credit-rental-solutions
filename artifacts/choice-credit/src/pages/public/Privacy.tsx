@@ -26,7 +26,7 @@ We do not sell, rent, or trade your personal information to third parties for ma
   },
   {
     title: "Your Rights",
-    content: `You have the right to access the personal information we hold about you, request corrections, or request that we delete your information, subject to our legal obligations. To exercise any of these rights, contact us at privacy@choicecredit.com. We will respond to all requests within 30 days.`,
+    content: `You have the right to access the personal information we hold about you, request corrections, or request that we delete your information, subject to our legal obligations. To exercise any of these rights, contact us at choicecreditandrentalsolutions@gmail.com. We will respond to all requests within 30 days.`,
   },
   {
     title: "Cookies",
@@ -46,7 +46,7 @@ We do not sell, rent, or trade your personal information to third parties for ma
   },
   {
     title: "Contact Us",
-    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nChoice Credit & Rental Solutions\n100 Financial District Blvd, Suite 300\nNew York, NY 10005\nprivacy@choicecredit.com\n1 (800) 555-0198`,
+    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nChoice Credit & Rental Solutions\nchoicecreditandrentalsolutions@gmail.com\n(707) 063-1370 (text only)`,
   },
 ];
 

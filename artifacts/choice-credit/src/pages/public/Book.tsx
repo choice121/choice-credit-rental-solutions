@@ -75,13 +75,13 @@ function TrustPanel() {
 
       {/* Contact info */}
       <div className="space-y-2">
-        <a href="tel:18005550198" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
+        <a href="sms:7070631370" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
           <Phone className="w-4 h-4 shrink-0" />
-          1 (800) 555-0198
+          (707) 063-1370 · Text only
         </a>
-        <a href="mailto:support@choicecredit.com" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
+        <a href="mailto:choicecreditandrentalsolutions@gmail.com" className="flex items-center gap-3 text-sm text-foreground/70 hover:text-primary transition-colors">
           <Mail className="w-4 h-4 shrink-0" />
-          support@choicecredit.com
+          choicecreditandrentalsolutions@gmail.com
         </a>
       </div>
 

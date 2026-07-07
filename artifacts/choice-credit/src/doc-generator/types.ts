@@ -65,7 +65,7 @@ export const DEFAULT_ADVISOR: AdvisorInfo = {
   name: "Credit Advisor",
   title: "Senior Credit & Rental Advisor",
   phone: "(404) 555-0100",
-  email: "info@choicecreditrental.com",
+  email: "choicecreditandrentalsolutions@gmail.com",
   company: "Choice Credit & Rental Solutions",
   address: "Atlanta, Georgia",
 };
