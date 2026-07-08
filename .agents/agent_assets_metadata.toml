@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "1APv7BQKemzfwT-oLBeDL"
+uri = "file://attached_assets/generated_images/choice_credit_logo.png"
+type = "image"
+title = "Choice Credit and Rental Solutions — Logo"
