@@ -52,17 +52,21 @@ A full-stack credit and rental approval consulting platform that guides clients 
 
 ## Product
 
-- **Public marketing site**: Home, Services (3 packages), Tradeline Calculator, Book Consultation, Contact
+- **Public marketing site**: Home, Services (5 packages), Tradeline Calculator, Book Consultation, Contact
 - **Client portal**: Dashboard, Documents (upload/track), Approval Plan, Messages (real-time thread with advisor), Billing (payment method selection)
 - **Admin dashboard**: Stats overview, Client management, Leads pipeline, Message inbox, Revenue breakdown
 
 ## Packages (seeded in DB)
 
-| Tier | Name | Price |
-|------|------|-------|
-| Starter | Readiness Report | $149 |
-| Standard | Guided Approval Package | $349 |
-| Premium | Full-Service Approval | $649 |
+Legacy 3-tier consulting packages (Readiness Report, Guided Approval, Full-Service Approval) and old add-ons (Rental History Verification, Car Approval, Expedited Review, Additional Tradeline) were deactivated (`is_active=false`, not deleted) on 2026-07-08 in favor of the lineup below, which mirrors a competitor's (IES) model per user request. Note the Co-Signer Program and Instant Approval Service (sublease-based, no tenant screening) carry meaningfully higher legal/fraud-exposure risk than typical credit-consulting services — the user was briefed and confirmed proceeding.
+
+| Category | Name | Price | Slug |
+|------|------|-------|------|
+| Assessment | Approval Assessment | $150 | `assessment` |
+| Profile Building | Standard Housing Package | $950 | `standard-housing` |
+| Profile Building | Expedited Housing Package | $1,400 | `expedited-housing` |
+| Done-For-You | Co-Signer Program | $800 | `co-signer` |
+| Done-For-You | Instant Approval Service | $2,500–$2,800 | `instant-approval` |
 
 ## User preferences
 

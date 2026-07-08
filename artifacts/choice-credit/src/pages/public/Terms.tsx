@@ -7,7 +7,7 @@ const SECTIONS = [
   },
   {
     title: "Description of Services",
-    content: `Choice Credit & Rental Solutions provides credit consulting, rental approval strategy, authorized user tradeline placement, co-signer services, and related advisory services. Our services are designed to help clients improve their rental application profile using legal and ethical methods grounded in the Fair Credit Reporting Act (FCRA).
+    content: `Choice Credit & Rental Solutions provides credit consulting, rental approval strategy, authorized user tradeline placement, co-signer services, and instant approval (sublease) services. Our services are designed to help clients improve their rental application profile using legal and ethical methods grounded in the Fair Credit Reporting Act (FCRA).
 
 We do not guarantee approval from any specific landlord, property manager, or screening company. Our services improve the strength and presentation of your application, but approval decisions are made by third parties outside our control.`,
   },
@@ -27,10 +27,10 @@ We reserve the right to terminate services immediately without refund if we dete
     content: `All service fees are displayed on our Services page and communicated before any payment is collected. Payments are due at the start of service unless otherwise agreed in writing. 
 
 Refund eligibility varies by service type:
-• Readiness Report: Non-refundable once delivered
-• Consulting Packages: Refundable within 48 hours of purchase if no advisory work has begun
-• Profile Building Packages: Non-refundable once tradeline placements have been initiated
-• Done-For-You Services: Non-refundable once a co-signer or lease application has been submitted
+• Approval Assessment: Non-refundable once the report has been delivered
+• Standard & Expedited Housing Packages: Refundable within 48 hours of purchase if no credit-building work has begun; non-refundable once tradeline placements have been initiated
+• Co-Signer Program: Non-refundable once the co-signer has been submitted on a rental application
+• Instant Approval Service: Non-refundable once a lease has been signed on the client's behalf
 
 We evaluate refund requests on a case-by-case basis for exceptional circumstances. Contact choicecreditandrentalsolutions@gmail.com to submit a refund request.`,
   },

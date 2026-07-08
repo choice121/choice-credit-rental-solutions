@@ -26,7 +26,7 @@ const FAQS: FAQItem[] = [
   },
   {
     q: "How long does the process take?",
-    a: "It depends on the service. Our Readiness Report is delivered within 48–72 hours. Consulting packages (Guided Approval, Full-Service) typically produce results in 2–4 weeks. Profile Building packages run 30–45 days for standard, 7–14 days for expedited. Our Instant Approval Service can have you in a unit within 48–72 hours. We'll give you a realistic timeline during your free consultation — we don't overpromise.",
+    a: "It depends on the service. Our Approval Assessment is delivered within 24 hours. The Co-Signer Program typically finalizes within 48 hours of approval. Standard and Expedited Housing Packages run 30–45 days and 7–14 days respectively. Our Instant Approval Service can have you in a unit within days, since it bypasses traditional screening entirely. We'll give you a realistic timeline during your free consultation — we don't overpromise.",
   },
   {
     q: "What if I have an eviction or bankruptcy on my record?",

@@ -3,71 +3,29 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Check, ClipboardList, TrendingUp, UserCheck, Zap, Car, Home,
-  ArrowRight, Star, FileSearch, AlertCircle, CheckCircle2, ShieldCheck, X
+  Check, ClipboardList, TrendingUp, UserCheck, Zap, Home,
+  ArrowRight, Star, AlertCircle, CheckCircle2, ShieldCheck
 } from "lucide-react";
 import { Link } from "wouter";
 import Testimonials from "@/components/Testimonials";
 import ScrollReveal from "@/components/ScrollReveal";
 
-const STATIC_PACKAGES = [
-  {
-    slug: "readiness-report",
-    name: "Readiness Report",
-    price: "$149",
-    timeline: null,
-    badge: null,
-    description: "A professional analysis of your credit and rental profile with a clear action plan.",
-    features: [
-      "Full credit profile review",
-      "Rental history assessment",
-      "Written action plan",
-      "Score improvement roadmap",
-      "One advisor check-in",
-    ],
-    cta: "Get My Report",
-    href: "/book?service=readiness-report",
-    highlight: false,
-  },
-  {
-    slug: "guided-approval",
-    name: "Guided Approval Package",
-    price: "$349",
-    timeline: null,
-    badge: "Most Popular",
-    description: "Hands-on consulting to guide you through the full approval process step by step.",
-    features: [
-      "Everything in Readiness Report",
-      "Dispute letter drafting",
-      "1 authorized tradeline placement",
-      "Rental application review",
-      "Unlimited advisor messaging",
-      "Document checklist & tracking",
-    ],
-    cta: "Get Started",
-    href: "/book?service=guided-approval",
-    highlight: true,
-  },
-  {
-    slug: "full-service-approval",
-    name: "Full-Service Approval",
-    price: "$649",
-    timeline: null,
-    badge: "Premium",
-    description: "Complete done-with-you service — we manage your entire path from denied to approved.",
-    features: [
-      "Everything in Guided Approval",
-      "2 authorized tradeline placements",
-      "Priority advisor access",
-      "Income documentation strategy",
-      "Application submission support",
-      "Lease review & guidance",
-    ],
-    cta: "Get Full Service",
-    href: "/book?service=full-service-approval",
-    highlight: false,
-  },
-];
+const ASSESSMENT = {
+  slug: "assessment",
+  name: "Approval Assessment",
+  price: "$150",
+  badge: "Start Here",
+  description: "Find out exactly where you stand before you apply. A full tenant screening pull, credit profile review, and rental history check — delivered as a written report within 24 hours.",
+  features: [
+    "Full tenant screening pull (same report property managers use)",
+    "Credit profile & tradeline analysis",
+    "Rental history verification",
+    "Written approval strategy report",
+    "24-hour turnaround",
+  ],
+  cta: "Get My Assessment",
+  href: "/book?service=assessment",
+};
 
 const PROFILE_PACKAGES = [
   {
@@ -148,44 +106,6 @@ const DONE_FOR_YOU = [
   },
 ];
 
-const ADDONS = [
-  {
-    name: "Approval Assessment",
-    price: "$150",
-    description: "Full tenant screening pull — know exactly where you stand before applying. Delivered in 24 hours.",
-    badge: "Start Here",
-    href: "/book?service=assessment",
-  },
-  {
-    name: "Rental History Verification",
-    price: "$199",
-    description: "We document, verify, and present your rental history in the format landlords trust — even if it's limited, disputed, or incomplete.",
-    badge: "New",
-    href: "/book?service=rental-history",
-  },
-  {
-    name: "Car Approval Package",
-    price: "$1,600",
-    description: "Three seasoned tradelines designed to improve your financing readiness for vehicle purchases. Profile builds in 30 days.",
-    badge: "Auto",
-    href: "/book?service=car-approval",
-  },
-  {
-    name: "Expedited Review",
-    price: "$99",
-    description: "24-hour turnaround on document review — for clients who need to move fast.",
-    badge: "Add-on",
-    href: "/book?service=expedited-review",
-  },
-  {
-    name: "Additional Tradeline",
-    price: "Varies",
-    description: "Strategic tradeline placement to boost specific scoring criteria beyond your package.",
-    badge: "Add-on",
-    href: "/book?service=tradeline",
-  },
-];
-
 // ── Guarantee Section ────────────────────────────────────────────────────────
 function GuaranteeSection() {
   const points = [
@@ -238,117 +158,6 @@ function GuaranteeSection() {
             </div>
           </ScrollReveal>
         </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Package Comparison Table ─────────────────────────────────────────────────
-function PackageComparison() {
-  const features = [
-    { label: "Full credit profile review", tiers: [true, true, true] },
-    { label: "Written action plan & roadmap", tiers: [true, true, true] },
-    { label: "One advisor check-in call", tiers: [true, true, true] },
-    { label: "Custom dispute letters", tiers: [false, true, true] },
-    { label: "Authorized tradeline placement", tiers: [false, "1 tradeline", "2 tradelines"] },
-    { label: "Rental application review", tiers: [false, true, true] },
-    { label: "Unlimited advisor messaging", tiers: [false, true, true] },
-    { label: "Document checklist & tracking", tiers: [false, true, true] },
-    { label: "Income documentation strategy", tiers: [false, false, true] },
-    { label: "Priority advisor access", tiers: [false, false, true] },
-    { label: "Application submission support", tiers: [false, false, true] },
-    { label: "Lease review & guidance", tiers: [false, false, true] },
-  ];
-
-  const tiers = [
-    { name: "Readiness Report", price: "$149", highlight: false },
-    { name: "Guided Approval", price: "$349", highlight: true },
-    { name: "Full-Service", price: "$649", highlight: false },
-  ];
-
-  function Cell({ value }: { value: boolean | string }) {
-    if (value === true) return <Check className="w-5 h-5 text-emerald-500 mx-auto" />;
-    if (value === false) return <X className="w-4 h-4 text-muted-foreground/30 mx-auto" />;
-    return <span className="text-xs font-semibold text-primary">{value}</span>;
-  }
-
-  return (
-    <section className="py-16 bg-muted/30 border-y">
-      <div className="container max-w-4xl">
-        <ScrollReveal>
-          <div className="text-center mb-10">
-            <h3 className="font-serif text-2xl font-bold text-foreground mb-2">Compare packages side by side</h3>
-            <p className="text-muted-foreground text-sm">See exactly what's included in each tier before you decide.</p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal delay={100}>
-          {/* Desktop table */}
-          <div className="hidden md:block rounded-2xl overflow-hidden border bg-card shadow-sm">
-            <div className="grid grid-cols-4 border-b">
-              <div className="p-5 text-sm font-semibold text-muted-foreground">Feature</div>
-              {tiers.map((tier, i) => (
-                <div key={i} className={`p-5 text-center border-l ${tier.highlight ? "bg-primary text-primary-foreground" : ""}`}>
-                  <p className="font-bold text-sm">{tier.name}</p>
-                  <p className={`text-xl font-bold mt-1 ${tier.highlight ? "text-primary-foreground" : "text-foreground"}`}>{tier.price}</p>
-                </div>
-              ))}
-            </div>
-            {features.map((row, i) => (
-              <div key={i} className={`grid grid-cols-4 border-t ${i % 2 === 0 ? "" : "bg-muted/20"}`}>
-                <div className="p-4 text-sm text-foreground/80 flex items-center">{row.label}</div>
-                {row.tiers.map((val, j) => (
-                  <div key={j} className={`p-4 border-l flex items-center justify-center ${tiers[j].highlight ? "bg-primary/5" : ""}`}>
-                    <Cell value={val} />
-                  </div>
-                ))}
-              </div>
-            ))}
-            <div className="grid grid-cols-4 border-t bg-muted/30">
-              <div className="p-4" />
-              {tiers.map((tier, i) => (
-                <div key={i} className={`p-4 border-l ${tier.highlight ? "bg-primary/5" : ""}`}>
-                  <Button asChild size="sm" className="w-full" variant={tier.highlight ? "default" : "outline"}>
-                    <Link href={`/book?service=${["readiness-report","guided-approval","full-service-approval"][i]}`}>
-                      Choose {tier.name.split(" ")[0]}
-                    </Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile — stacked tier cards */}
-          <div className="md:hidden space-y-4">
-            {tiers.map((tier, ti) => (
-              <div key={ti} className={`rounded-2xl border overflow-hidden shadow-sm ${tier.highlight ? "border-primary border-2" : ""}`}>
-                <div className={`px-5 py-4 ${tier.highlight ? "bg-primary text-primary-foreground" : "bg-muted/40"}`}>
-                  <p className="font-bold">{tier.name}</p>
-                  <p className={`text-2xl font-bold ${tier.highlight ? "text-primary-foreground" : "text-foreground"}`}>{tier.price}</p>
-                </div>
-                <div className="divide-y">
-                  {features.map((row, fi) => {
-                    const val = row.tiers[ti];
-                    if (val === false) return null;
-                    return (
-                      <div key={fi} className="flex items-center gap-3 px-5 py-3">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span className="text-sm text-foreground/80">{typeof val === "string" ? `${row.label} (${val})` : row.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="p-4 border-t">
-                  <Button asChild size="sm" className="w-full" variant={tier.highlight ? "default" : "outline"}>
-                    <Link href={`/book?service=${["readiness-report","guided-approval","full-service-approval"][ti]}`}>
-                      Choose {tier.name}
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
       </div>
     </section>
   );
@@ -450,70 +259,6 @@ function SeriousClientsOnly() {
   );
 }
 
-// Rental History Verification section
-function RentalHistoryVerification() {
-  const features = [
-    "Rental history audit — we review every past tenancy on record",
-    "Verification letter drafting for landlords and property managers",
-    "Prior landlord outreach and reference coordination",
-    "Positive history presentation package (formatted, professional)",
-    "Custom narrative creation for limited or incomplete histories",
-    "Dispute support for inaccurate or unfair rental history entries",
-  ];
-
-  return (
-    <section className="py-20 bg-background" id="rental-history-verification">
-      <div className="container max-w-6xl">
-        <div className="grid lg:grid-cols-2 gap-14 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-600 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
-              <FileSearch className="w-4 h-4" />
-              Rental History Verification
-            </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-5 leading-tight">
-              Your rental past doesn't<br className="hidden sm:block" /> have to define your future.
-            </h2>
-            <p className="text-muted-foreground text-lg mb-5 leading-relaxed">
-              Landlords treat rental history as a mirror of your reliability. But what if your history is incomplete, disputed, or simply not told in the right way? We fix that.
-            </p>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              Whether you have gaps, an old eviction, no rental history at all, or references you can't track down — we document, verify, and present your story in a format that builds trust with landlords instead of raising red flags.
-            </p>
-            <Button asChild className="h-12 px-6">
-              <Link href="/book?service=rental-history">
-                Get Rental History Help <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            <p className="text-xs text-muted-foreground mt-3">Standalone service · $199 · No package required</p>
-          </div>
-
-          <div className="bg-card border rounded-2xl p-8 shadow-sm">
-            <h3 className="font-semibold text-foreground mb-6 text-sm uppercase tracking-wider">What's included</h3>
-            <ul className="space-y-4">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-blue-600" />
-                  </div>
-                  <span className="text-sm text-foreground/80 leading-relaxed">{f}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-7 pt-6 border-t flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-bold text-foreground">$199</span>
-                <span className="text-muted-foreground text-sm ml-2">one-time</span>
-              </div>
-              <Badge variant="secondary" className="text-xs font-semibold">Standalone Add-on</Badge>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function Services() {
   return (
     <PublicLayout>
@@ -570,68 +315,52 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Consulting Packages */}
+      {/* Approval Assessment — entry point */}
       <section className="py-20 bg-background">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-14">
+        <div className="container max-w-4xl">
+          <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
               <ClipboardList className="w-4 h-4" />
-              Consulting Packages
+              Step One
             </div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Guided by an advisor, every step of the way
+              Not sure where you stand? Start with an assessment.
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              We work with you directly — reviewing your profile, building your strategy, and managing your path to approval.
+              We recommend every client start here — it tells you exactly what you qualify for before you spend on anything else.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 items-center">
-            {STATIC_PACKAGES.map((pkg) => (
-              <Card
-                key={pkg.slug}
-                className={`relative flex flex-col transition-shadow hover:shadow-xl ${pkg.highlight ? "border-2 border-primary shadow-2xl md:scale-105 z-10" : ""}`}
-              >
-                {pkg.badge && (
-                  <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-full text-sm font-bold tracking-wide uppercase ${pkg.highlight ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"}`}>
-                    {pkg.badge}
-                  </div>
-                )}
-                <CardHeader className={pkg.highlight ? "bg-primary text-primary-foreground rounded-t-xl pt-8" : "pt-8"}>
-                  <CardTitle className="text-2xl font-serif">{pkg.name}</CardTitle>
-                  <CardDescription className={pkg.highlight ? "text-primary-foreground/80" : ""}>
-                    {pkg.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 pt-6">
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">{pkg.price}</span>
-                    <span className="text-muted-foreground ml-2">one-time</span>
-                  </div>
-                  <ul className="space-y-3">
-                    {pkg.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 shrink-0 mt-0.5 text-accent" />
-                        <span className="text-sm">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter className="pt-6">
-                  <Button asChild className="w-full" variant={pkg.highlight ? "default" : "outline"}>
-                    <Link href={pkg.href}>{pkg.cta}</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          <Card className="relative flex flex-col md:flex-row items-stretch overflow-hidden border-2 border-primary shadow-xl">
+            <div className="absolute top-0 left-6 -translate-y-1/2 px-4 py-1 rounded-full text-sm font-bold tracking-wide uppercase bg-accent text-accent-foreground">
+              {ASSESSMENT.badge}
+            </div>
+            <div className="flex-1 p-8 pt-10">
+              <CardTitle className="text-2xl font-serif mb-2">{ASSESSMENT.name}</CardTitle>
+              <CardDescription className="text-base mb-6">{ASSESSMENT.description}</CardDescription>
+              <ul className="space-y-3">
+                {ASSESSMENT.features.map((f, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <Check className="w-5 h-5 shrink-0 mt-0.5 text-accent" />
+                    <span className="text-sm">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="md:w-64 shrink-0 bg-muted/40 p-8 flex flex-col items-center justify-center text-center gap-4 border-t md:border-t-0 md:border-l">
+              <div>
+                <span className="text-4xl font-bold">{ASSESSMENT.price}</span>
+                <p className="text-muted-foreground text-sm mt-1">one-time · 24-hour turnaround</p>
+              </div>
+              <Button asChild className="w-full">
+                <Link href={ASSESSMENT.href}>{ASSESSMENT.cta}</Link>
+              </Button>
+            </div>
+          </Card>
         </div>
       </section>
 
-      {/* Package comparison table */}
-      <PackageComparison />
-
-      {/* Full Testimonials carousel after consulting packages */}
+      {/* Full Testimonials carousel after the assessment */}
       <Testimonials />
 
       {/* Profile Building Packages */}
@@ -694,9 +423,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Rental History Verification */}
-      <RentalHistoryVerification />
-
       {/* Done-For-You Services */}
       <section className="py-20 bg-muted/30 border-y">
         <div className="container max-w-6xl">
@@ -750,44 +476,6 @@ export default function Services() {
                     <Link href={svc.href}>
                       Get Started <ArrowRight className="w-4 h-4 ml-1.5" />
                     </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Additional Services & Add-ons */}
-      <section className="py-20 bg-background border-t">
-        <div className="container max-w-5xl">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
-              <Car className="w-4 h-4" />
-              Additional Services & Add-ons
-            </div>
-            <h2 className="font-serif text-3xl font-bold text-foreground mb-3">
-              Standalone services & upgrades
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Entry-point diagnostics, rental history support, auto financing prep, and add-ons to supercharge any package.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ADDONS.map((addon) => (
-              <Card key={addon.name} className="flex flex-col hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <CardTitle className="text-lg font-semibold">{addon.name}</CardTitle>
-                    <Badge variant="outline" className="text-xs">{addon.badge}</Badge>
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">{addon.price}</div>
-                  <CardDescription className="text-sm leading-relaxed">{addon.description}</CardDescription>
-                </CardHeader>
-                <CardFooter className="mt-auto pt-0">
-                  <Button asChild variant="outline" size="sm" className="w-full">
-                    <Link href={addon.href}>Book Now</Link>
                   </Button>
                 </CardFooter>
               </Card>

@@ -345,7 +345,7 @@ export default function ClientDetail() {
                     <Input
                       value={newCasePkg}
                       onChange={(e) => setNewCasePkg(e.target.value)}
-                      placeholder="e.g. Rental Readiness Report"
+                      placeholder="e.g. Approval Assessment"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -633,7 +633,7 @@ export default function ClientDetail() {
                         <Input
                           value={newInvoicePkg}
                           onChange={(e) => setNewInvoicePkg(e.target.value)}
-                          placeholder="e.g. Rental Readiness Report"
+                          placeholder="e.g. Approval Assessment"
                         />
                       </div>
                       <div className="space-y-1.5">
